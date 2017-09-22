@@ -24,6 +24,9 @@
         "squizlabs/php_codesniffer": "^2.3"
     },
     "autoload": {
+        "files": [
+            "src/helpers.php"
+        ],
         "psr-4": {
             "acacha\\relationships\\": "src"
         }
@@ -41,6 +44,14 @@
     "extra": {
         "branch-alias": {
             "dev-master": "1.0-dev"
+        },
+        "laravel": {
+            "providers": [
+                "Acacha\\Relationships\\Providers\\RelationshipsProvider"
+            ],
+            "aliases": {
+                "ScoolStaff": "Acacha\\Relationships\\Relationships"
+            }
         }
     },
     "config": {
