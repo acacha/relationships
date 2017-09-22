@@ -24,10 +24,14 @@ class CreateAddressesTable extends Migration
             $table->string('number');
             $table->string('floor');
             $table->string('floor_number');
-            $table->string('postalCode');
-            $table->string('location');
+            $table->integer('postalcode')->unsigned();
+            $table->integer('location')->unsigned();
             $table->string('province');
             $table->string('country');
+
+            $table->foreign('postalcode')->references('id')->on('postalcodes')->onDelete('cascade');
+            $table->foreign('location')->references('id')->on('locations')->onDelete('cascade');
+
             $table->timestamps();
         });
 

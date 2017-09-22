@@ -19,9 +19,9 @@ class CreateIdentifiersTable extends Migration
         Schema::create('identifiers', function (Blueprint $table) {
             $table->increments('id');
             $table->string('value');
-            $table->integer('type')->unsigned();
-            $table->foreign('type')->references('id')->on('identifier_types')->onDelete('cascade');
-            $table->unique(['value', 'type']);
+            $table->integer('type_id')->unsigned();
+            $table->foreign('type_id')->references('id')->on('identifier_types')->onDelete('cascade');
+            $table->unique(['value', 'type_id']);
             $table->timestamps();
         });
 
