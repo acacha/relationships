@@ -18,19 +18,20 @@ class CreateAddressesTable extends Migration
     {
         Schema::create('addresses', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name');
-            $table->string('fullname');
-            $table->string('type');
-            $table->string('number');
-            $table->string('floor');
-            $table->string('floor_number');
+            $table->string('name')->nullable();
+            $table->string('fullname')->unique();
+            $table->string('type')->nullable();
+            $table->string('number')->nullable();
+            $table->string('floor')->nullable();
+            $table->string('floor_number')->nullable();
             $table->integer('postalcode')->unsigned();
             $table->integer('location')->unsigned();
-            $table->string('province');
-            $table->string('country');
+            $table->integer('province_id')->unsigned();
+            $table->string('country_code');
 
             $table->foreign('postalcode')->references('id')->on('postalcodes')->onDelete('cascade');
             $table->foreign('location')->references('id')->on('locations')->onDelete('cascade');
+            $table->foreign('province_id')->references('id')->on('provinces')->onDelete('cascade');
 
             $table->timestamps();
         });
