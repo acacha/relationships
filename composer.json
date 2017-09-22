@@ -28,12 +28,12 @@
             "src/helpers.php"
         ],
         "psr-4": {
-            "acacha\\relationships\\": "src"
+            "Acacha\\Relationships\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "acacha\\relationships\\": "tests"
+            "Acacha\\Relationships\\": "tests"
         }
     },
     "scripts": {
