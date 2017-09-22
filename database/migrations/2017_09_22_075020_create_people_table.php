@@ -26,7 +26,7 @@ class CreatePeopleTable extends Migration
             $table->date('birthdate');
             $table->integer('birthplace_id')->unsigned();
             $table->enum('gender',['Male','Female']);
-            $table->enum('civil_status',['Soltero/a','Casado/a','Separado/a','Divorciado/a',['Viudo/a']]);
+            $table->enum('civil_status',['Soltero/a','Casado/a','Separado/a','Divorciado/a','Viudo/a']);
             $table->timestamps();
         });
 

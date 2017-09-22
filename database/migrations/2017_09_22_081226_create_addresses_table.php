@@ -38,7 +38,7 @@ class CreateAddressesTable extends Migration
             $table->timestamps();
             $table->unique(['address_id', 'person_id']);
             $table->foreign('address_id')->references('id')->on('addresses')->onDelete('cascade');
-            $table->foreign('person_id')->references('id')->on('persons')->onDelete('cascade');
+            $table->foreign('person_id')->references('id')->on('people')->onDelete('cascade');
         });
     }
 

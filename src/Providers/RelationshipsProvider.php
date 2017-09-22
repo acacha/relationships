@@ -2,6 +2,7 @@
 
 namespace Acacha\Relationships\Providers;
 
+use Illuminate\Support\ServiceProvider;
 use Acacha\Relationships\Relationships;
 
 /**
@@ -10,7 +11,7 @@ use Acacha\Relationships\Relationships;
  * @package Acacha\Relationships\Providers
  */
 
-class RelationshipsProvider
+class RelationshipsProvider extends ServiceProvider
 {
     /**
      * Bootstrap the application services.
@@ -57,10 +58,11 @@ class RelationshipsProvider
         }
     }
 
-    protected function loadMigrations()
+    /**
+     * Load migrations.
+     */
+    private function loadMigrations()
     {
-        $this->loadViewsFrom(RELATIONSHIPS_PATH.'/resources/views/', 'acacha_relationships');
-
-        $this->publishes(Relationships::views(), 'acacha_relationships');
+        $this->loadMigrationsFrom(RELATIONSHIPS_PATH . '/database/migrations');
     }
 }

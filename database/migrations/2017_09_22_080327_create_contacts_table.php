@@ -31,7 +31,7 @@ class CreateContactsTable extends Migration
 
             $table->unique(['person_id', 'contact_id']);
 
-            $table->foreign('person_id')->references('id')->on('persons')->onDelete('cascade');
+            $table->foreign('person_id')->references('id')->on('people')->onDelete('cascade');
             $table->foreign('contact_id')->references('id')->on('contacts')->onDelete('cascade');
 
             $table->timestamps();

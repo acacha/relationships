@@ -14,7 +14,7 @@ class Relationships
      *
      * @return array
      */
-    public function views()
+    public static function views()
     {
         return [
             RELATIONSHIPS_PATH.'/resources/views/example.php' =>
