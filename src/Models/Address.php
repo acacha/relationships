@@ -11,5 +11,22 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Address extends Model
 {
-    //
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'name',
+        'fullname',
+        'type',
+        'number',
+        'floor',
+        'floor_number',
+        'postalcode',
+        'location',
+        'province_id',
+        'country_code',
+    ];
+
 }

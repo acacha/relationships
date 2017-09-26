@@ -4,18 +4,40 @@ use Acacha\Relationships\Models\Contact;
 use Acacha\Relationships\Models\ContactType;
 use Acacha\Relationships\Models\Identifier;
 use Acacha\Relationships\Models\IdentifierType;
+use Acacha\Relationships\Models\Address;
+use Acacha\Relationships\Models\Location;
 
-if (! function_exists('seed_postalcodes')) {
-    function seed_postalcodes()
+if (! function_exists('seed_locations')) {
+    /**
+     * Seed locations.
+     */
+    function seed_locations()
     {
-        //
+        Artisan::call('seed:locations');
     }
 }
 
-if (! function_exists('first_or_create_codigo_postal')) {
-    function first_or_create_codigo_postal($postalcode, $location)
+if (! function_exists('first_or_create_location')) {
+    /**
+     * First or create location.
+     *
+     * @param $location
+     * @param $postalcode
+     * @return mixed
+     */
+    function first_or_create_location($location, $postalcode )
     {
-        //
+        try {
+            return Location::create([
+                'name' => $location,
+                'postalcode' => $postalcode
+            ]);
+        } catch (Illuminate\Database\QueryException $e) {
+            return Location::where([
+                'name' => $location,
+                'postalcode' => $postalcode
+            ]);
+        }
     }
 }
 
@@ -228,8 +250,80 @@ if (! function_exists('seed_provinces')) {
     }
 }
 
+if (! function_exists('obtainProvinceByPostalCode')) {
+    /**
+     * Obtain province by postal code.
+     *
+     * @param $code
+     * @return mixed
+     */
+    function obtainProvinceByPostalCode($code)
+    {
+        return Province::first();
+    }
+}
 
+if (! function_exists('obtainProvinceIdByPostalCode')) {
+    /**
+     * Obtain province id by postal code.
+     *
+     * @param $code
+     * @return mixed
+     */
+    function obtainProvinceIdByPostalCode($code)
+    {
+        return Province::first()->id;
+    }
+}
 
+if (! function_exists('first_or_create_address')) {
+    /**
+     * Create address if not exists and return new o already existing address.
+     *
+     * @param $fullname
+     * @param null $name
+     * @param null $type
+     * @param null $number
+     * @param null $floor
+     * @param null $floor_number
+     * @param null $postalcode
+     * @param null $location
+     * @param null $province
+     * @param string $country_code
+     * @return mixed
+     */
+    function first_or_create_address(
+        $fullname,
+        $name = null,
+        $type = null,
+        $number = null,
+        $floor = null,
+        $floor_number = null,
+        $postalcode = null,
+        $location = null,
+        $province = null,
+        $country_code = "ESP"
+    )
+    {
+        try {
+            return Address::create([
+                'name' => $name,
+                'fullname' => $fullname,
+                'type' => $type,
+                'number' => $number,
+                'floor' => $floor,
+                'floor_number' => $floor_number,
+                'postalcode' => $postalcode,
+                'location' => $location,
+                'province_id' => $province,
+                'country_code' => $country_code
+            ]);
+        } catch (Illuminate\Database\QueryException $e) {
+            dd($e);
+            return Contact::where('fullname', $fullname);
+        }
+    }
+}
 
 if (! function_exists('seed_relationships')) {
     function seed_relationships()

@@ -37,7 +37,7 @@ class CodigosPostalesListImport extends ExcelFile
     /**
      * @var null
      */
-    protected $encoding = 'ISO-8859-1';
+//    protected $encoding = 'ISO-8859-1';
 
     /**
      * @var string
