@@ -11,5 +11,10 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Province extends Model
 {
-    //
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = ['name','state_id'];
 }

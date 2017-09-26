@@ -22,11 +22,11 @@ class CreatePeopleTable extends Migration
             $table->string('givenName');
             $table->string('surname');
             $table->string('surname1');
-            $table->string('surname2');
-            $table->date('birthdate');
-            $table->integer('birthplace_id')->unsigned();
-            $table->enum('gender',['Male','Female']);
-            $table->enum('civil_status',['Soltero/a','Casado/a','Separado/a','Divorciado/a','Viudo/a']);
+            $table->string('surname2')->nullable();
+            $table->date('birthdate')->nullable();;
+            $table->integer('birthplace_id')->unsigned()->nullable();;
+            $table->enum('gender',['Male','Female'])->nullable();;
+            $table->enum('civil_status',['Soltero/a','Casado/a','Separado/a','Divorciado/a','Viudo/a'])->nullable();;
             $table->timestamps();
         });
 

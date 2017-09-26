@@ -6,6 +6,7 @@ use Acacha\Relationships\Models\Identifier;
 use Acacha\Relationships\Models\IdentifierType;
 use Acacha\Relationships\Models\Address;
 use Acacha\Relationships\Models\Location;
+use Acacha\Relationships\Models\Person;
 
 if (! function_exists('seed_locations')) {
     /**
@@ -130,6 +131,16 @@ if (! function_exists('seed_identifier_types')) {
         first_or_create_identifier_type('NIE');
         first_or_create_identifier_type('TIS');
         first_or_create_identifier_type('TODO');
+    }
+}
+
+if (! function_exists('seed_identifiers')) {
+    /**
+     * Create identifiers.
+     */
+    function seed_identifiers()
+    {
+        Artisan::call('seed:identifiers');
     }
 }
 
@@ -299,7 +310,6 @@ if (! function_exists('first_or_create_address')) {
         $number = null,
         $floor = null,
         $floor_number = null,
-        $postalcode = null,
         $location = null,
         $province = null,
         $country_code = "ESP"
@@ -313,7 +323,6 @@ if (! function_exists('first_or_create_address')) {
                 'number' => $number,
                 'floor' => $floor,
                 'floor_number' => $floor_number,
-                'postalcode' => $postalcode,
                 'location' => $location,
                 'province_id' => $province,
                 'country_code' => $country_code
@@ -325,10 +334,68 @@ if (! function_exists('first_or_create_address')) {
     }
 }
 
+if (! function_exists('seed_contacts')) {
+    function seed_contacts()
+    {
+        Artisan::call('seed:contacts');
+    }
+}
+if (! function_exists('first_or_create_people')) {
+    /**
+     * First or create people.
+     *
+     * @param $name
+     * @param $givenName
+     * @param $surname
+     * @param $surname1
+     * @param $surname2
+     * @param $birthdate
+     * @param $birthplace_id
+     * @param $birthplace_id
+     * @param $gender
+     * @param $civil_status
+     */
+    function first_or_create_people(
+        $name,
+        $givenName,
+        $surname,
+        $surname1,
+        $surname2,
+        $birthdate,
+        $birthplace_id,
+        $gender,
+        $civil_status
+    )
+    {
+        try {
+            return Person::create([
+                'name' => $name,
+                'givenName' => $givenName,
+                'surname' => $surname,
+                'surname1' => $surname1,
+                'surname2' => $surname2,
+                'birthdate' => $birthdate,
+                'birthplace_id' => $birthplace_id,
+                'gender' => $gender,
+                'civil_status' => $civil_status
+            ]);
+        } catch (Illuminate\Database\QueryException $e) {
+            dd($e);
+            return Person::where('name', $name);
+        }
+    }
+}
+
+
 if (! function_exists('seed_relationships')) {
     function seed_relationships()
     {
         seed_identifier_types();
         seed_contact_types();
+        seed_identifiers();
+        seed_provinces();
+        seed_addresses();
+        seed_contacts();
+        seed_people();
     }
 }

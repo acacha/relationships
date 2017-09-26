@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
 /**
- * Class CreateAddressesTable
+ * Class CreateAddressesTable.
  */
 class CreateAddressesTable extends Migration
 {
@@ -24,9 +24,9 @@ class CreateAddressesTable extends Migration
             $table->string('number')->nullable();
             $table->string('floor')->nullable();
             $table->string('floor_number')->nullable();
-            $table->integer('location')->unsigned()->nullable();;
-            $table->integer('province_id')->unsigned()->nullable();;
-            $table->string('country_code')->nullable();;
+            $table->integer('location')->unsigned()->nullable();
+            $table->integer('province_id')->unsigned()->nullable();
+            $table->string('country_code')->nullable();
 
             $table->foreign('location')->references('id')->on('locations')->onDelete('cascade');
             $table->foreign('province_id')->references('id')->on('provinces')->onDelete('cascade');
