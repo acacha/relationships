@@ -7,6 +7,7 @@ use Acacha\Relationships\Models\IdentifierType;
 use Acacha\Relationships\Models\Address;
 use Acacha\Relationships\Models\Location;
 use Acacha\Relationships\Models\Person;
+use App\User;
 
 if (! function_exists('seed_locations')) {
     /**
@@ -340,6 +341,14 @@ if (! function_exists('seed_contacts')) {
         Artisan::call('seed:contacts');
     }
 }
+
+if (! function_exists('seed_addresses')) {
+    function seed_addresses()
+    {
+        Artisan::call('seed:addresses');
+    }
+}
+
 if (! function_exists('first_or_create_people')) {
     /**
      * First or create people.
@@ -368,6 +377,18 @@ if (! function_exists('first_or_create_people')) {
     )
     {
         try {
+            $existingUser = Person::where([
+                    'name' => $name,
+                    'gender' => $gender,
+                ], trim($name));
+            if ($existingUser->count() > 0) {
+                if (trim($existingUser->first()->gender) === trim($gender)) {
+                    if ($existingUser->first()->birthdate === $birthdate) {
+                        return;
+                    };
+                };
+            }
+
             return Person::create([
                 'name' => $name,
                 'givenName' => $givenName,
@@ -380,11 +401,37 @@ if (! function_exists('first_or_create_people')) {
                 'civil_status' => $civil_status
             ]);
         } catch (Illuminate\Database\QueryException $e) {
-            dd($e);
-            return Person::where('name', $name);
+            return;
         }
     }
 }
+if (! function_exists('first_or_create_user')) {
+    /**
+     * First or create user.
+     *
+     * @param $name
+     * @param $email
+     * @param $password
+     * @param $initialPassword
+     * @return mixed
+     */
+    function first_or_create_user($name, $email, $password, $initialPassword)
+    {
+        try {
+            return User::create([
+                'name' => $name,
+                'email' => $email,
+                'password' => $password,
+                'initialPassword' => $initialPassword
+            ]);
+        } catch (Illuminate\Database\QueryException $e) {
+            return User::where('email', $email)->first();
+        }
+    }
+}
+
+
+
 
 
 if (! function_exists('seed_relationships')) {

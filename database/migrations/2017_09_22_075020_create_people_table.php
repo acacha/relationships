@@ -23,14 +23,15 @@ class CreatePeopleTable extends Migration
             $table->string('surname');
             $table->string('surname1');
             $table->string('surname2')->nullable();
-            $table->date('birthdate')->nullable();;
-            $table->integer('birthplace_id')->unsigned()->nullable();;
-            $table->enum('gender',['Male','Female'])->nullable();;
-            $table->enum('civil_status',['Soltero/a','Casado/a','Separado/a','Divorciado/a','Viudo/a'])->nullable();;
+            $table->date('birthdate')->nullable();
+            $table->integer('birthplace_id')->unsigned()->nullable();
+            $table->enum('gender',['Male','Female'])->nullable();
+            $table->enum('civil_status',['Soltero/a','Casado/a','Separado/a','Divorciado/a','Viudo/a'])->nullable();
+            $table->unique(['name','birthdate','gender']);
             $table->timestamps();
         });
 
-        Schema::create('people_user', function (Blueprint $table) {
+        Schema::create('person_user', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('person_id')->unsigned();
             $table->integer('user_id')->unsigned();
@@ -49,6 +50,6 @@ class CreatePeopleTable extends Migration
     public function down()
     {
         Schema::dropIfExists('people');
-        Schema::dropIfExists('people_user');
+        Schema::dropIfExists('person_user');
     }
 }

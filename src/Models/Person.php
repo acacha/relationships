@@ -2,6 +2,7 @@
 
 namespace Acacha\Relationships\Models;
 
+use App\User;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -28,4 +29,46 @@ class Person extends Model
         'civil_status',
     ];
 
+    /**
+     * The identifiers that belong to the person.
+     */
+    public function identifiers()
+    {
+        return $this->belongsToMany(Identifier::class)->withTimestamps();
+    }
+
+    /**
+     * The contacts that belong to the person.
+     */
+    public function contacts()
+    {
+        return $this->belongsToMany(Contact::class)->withTimestamps();
+    }
+
+    /**
+     * The adresses that belong to the person.
+     */
+    public function addresses()
+    {
+        return $this->belongsToMany(Address::class)->withTimestamps();
+    }
+
+    /**
+     * The adresses that belong to the person.
+     */
+    public function users()
+    {
+        return $this->belongsToMany(User::class)->withTimestamps();
+    }
+
+    /**
+     * Get the person's DNI.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public function getDniAttribute($value)
+    {
+
+    }
 }
