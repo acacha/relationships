@@ -27,6 +27,7 @@ class Person extends Model
         'birthplace_id',
         'gender',
         'civil_status',
+        'notes'
     ];
 
     /**
@@ -54,11 +55,27 @@ class Person extends Model
     }
 
     /**
-     * The adresses that belong to the person.
+     * The users that belong to the person.
      */
     public function users()
     {
         return $this->belongsToMany(User::class)->withTimestamps();
+    }
+
+    /**
+     * Get the person's photos.
+     */
+    public function photos()
+    {
+        return $this->hasMany(Photo::class);
+    }
+
+    /**
+     * Get the phone record associated with the user.
+     */
+    public function migration_info()
+    {
+        return $this->hasOne(PersonMigrationInfo::class);
     }
 
     /**

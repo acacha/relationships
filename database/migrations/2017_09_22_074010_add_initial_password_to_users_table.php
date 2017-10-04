@@ -17,7 +17,7 @@ class AddInitialPasswordToUserstable extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('initialPassword')->after('password');
+            $table->string('initialPassword')->after('password')->nullable();
 
         });
     }

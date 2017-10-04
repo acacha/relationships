@@ -5,6 +5,8 @@ namespace Acacha\Relationships\Providers;
 use Illuminate\Support\ServiceProvider;
 use Acacha\Relationships\Relationships;
 
+use Illuminate\Database\Eloquent\Factory as EloquentFactory;
+
 /**
  * Class RelationshipsProvider.
  *
@@ -45,6 +47,8 @@ class RelationshipsProvider extends ServiceProvider
         $this->app->bind('Relationships', function () {
             return new Relationships();
         });
+
+        $this->registerEloquentFactoriesFrom(RELATIONSHIPS_PATH . '/database/factories');
     }
 
     protected function defineRoutes()
@@ -52,7 +56,7 @@ class RelationshipsProvider extends ServiceProvider
         if (!$this->app->routesAreCached()) {
             $router = app('router');
 
-            $router->group(['namespace' => 'Acacha\Scool\Staff\Http\Controllers'], function () {
+            $router->group(['namespace' => 'Acacha\Relationships\Http\Controllers'], function () {
                 require __DIR__.'/../Http/routes.php';
             });
         }
@@ -65,4 +69,16 @@ class RelationshipsProvider extends ServiceProvider
     {
         $this->loadMigrationsFrom(RELATIONSHIPS_PATH . '/database/migrations');
     }
+
+    /**
+     * Register factories.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    protected function registerEloquentFactoriesFrom($path)
+    {
+        $this->app->make(EloquentFactory::class)->load($path);
+    }
+
 }

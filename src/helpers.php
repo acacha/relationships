@@ -7,7 +7,76 @@ use Acacha\Relationships\Models\IdentifierType;
 use Acacha\Relationships\Models\Address;
 use Acacha\Relationships\Models\Location;
 use Acacha\Relationships\Models\Person;
+use Acacha\Relationships\Models\Photo;
 use App\User;
+use Spatie\Permission\PermissionRegistrar;
+
+if (! function_exists('create')) {
+    /**
+     * Create
+     *
+     * @param $class
+     * @param array $attributes
+     * @return mixed
+     */
+    function create($class, $attributes = []) {
+        return factory($class)->create($attributes);
+    }
+}
+
+if (! function_exists('make')) {
+    /**
+     * Make
+     *
+     * @param $class
+     * @param array $attributes
+     * @return mixed
+     */
+    function make($class,$attributes = []) {
+        return factory($class)->make($attributes);
+    }
+}
+
+
+if (! function_exists('initialize_relationships_management_permissions')) {
+
+    /**
+     * Initialize staff management permissions and roles.
+     */
+    function initialize_relationships_management_permissions()
+    {
+        $manageRelationships = role_first_or_create('manage-relationships');
+
+        //Relationships MANAGEMENT
+        permission_first_or_create('search-by-identifier');
+        give_permission_to_role($manageRelationships,'search-by-identifier');
+
+        //PersonPhoto
+        permission_first_or_create('store-person-photo');
+        permission_first_or_create('show-person-photo');
+        permission_first_or_create('update-person-photo');
+        permission_first_or_create('destroy-person-photo');
+        give_permission_to_role($manageRelationships,'store-person-photo');
+        give_permission_to_role($manageRelationships,'show-person-photo');
+        give_permission_to_role($manageRelationships,'update-person-photo');
+        give_permission_to_role($manageRelationships,'destroy-person-photo');
+
+        app(PermissionRegistrar::class)->registerPermissions();
+
+    }
+}
+
+if (! function_exists('first_user_as_relationships_manager')) {
+    /**
+     * Seed teachers.
+     */
+    function first_user_as_relationships_manager()
+    {
+        initialize_relationships_management_permissions();
+        $user = User::all()->first();
+        $user->assignRole('manage-relationships');
+    }
+}
 
 if (! function_exists('seed_locations')) {
     /**
@@ -335,6 +404,15 @@ if (! function_exists('first_or_create_address')) {
     }
 }
 
+if (! function_exists('seed_photos')) {
+    function seed_photos()
+    {
+        Artisan::call('seed:photos', [
+            '--skip-download' => true
+        ]);
+    }
+}
+
 if (! function_exists('seed_contacts')) {
     function seed_contacts()
     {
@@ -373,7 +451,8 @@ if (! function_exists('first_or_create_people')) {
         $birthdate,
         $birthplace_id,
         $gender,
-        $civil_status
+        $civil_status,
+        $notes
     )
     {
         try {
@@ -398,7 +477,8 @@ if (! function_exists('first_or_create_people')) {
                 'birthdate' => $birthdate,
                 'birthplace_id' => $birthplace_id,
                 'gender' => $gender,
-                'civil_status' => $civil_status
+                'civil_status' => $civil_status,
+                'notes' => $notes
             ]);
         } catch (Illuminate\Database\QueryException $e) {
             return;
@@ -430,8 +510,30 @@ if (! function_exists('first_or_create_user')) {
     }
 }
 
-
-
+if (! function_exists('first_or_create_photo')) {
+    /**
+     *
+     * First or create photo.
+     *
+     * @param $storage
+     * @param $path
+     * @return mixed
+     */
+    function first_or_create_photo($storage, $path)
+    {
+        try {
+            return Photo::create([
+                'storage' => $storage,
+                'path' => $path
+            ]);
+        } catch (Illuminate\Database\QueryException $e) {
+            return Photo::where([
+                'storage' => $storage,
+                'path' => $path
+            ])->first();
+        }
+    }
+}
 
 
 if (! function_exists('seed_relationships')) {

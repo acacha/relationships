@@ -25,8 +25,9 @@ class CreatePeopleTable extends Migration
             $table->string('surname2')->nullable();
             $table->date('birthdate')->nullable();
             $table->integer('birthplace_id')->unsigned()->nullable();
-            $table->enum('gender',['Male','Female'])->nullable();
+            $table->enum('gender',['male','female'])->nullable();
             $table->enum('civil_status',['Soltero/a','Casado/a','Separado/a','Divorciado/a','Viudo/a'])->nullable();
+            $table->string('notes')->nullable();
             $table->unique(['name','birthdate','gender']);
             $table->timestamps();
         });
