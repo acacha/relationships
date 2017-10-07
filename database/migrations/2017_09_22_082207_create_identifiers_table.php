@@ -43,7 +43,7 @@ class CreateIdentifiersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('identifiers');
         Schema::dropIfExists('identifier_person');
+        Schema::dropIfExists('identifiers');
     }
 }

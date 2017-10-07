@@ -61,6 +61,10 @@ if (! function_exists('initialize_relationships_management_permissions')) {
         give_permission_to_role($manageRelationships,'update-person-photo');
         give_permission_to_role($manageRelationships,'destroy-person-photo');
 
+        //User Relationships
+        permission_first_or_create('show-user-relationships');
+        give_permission_to_role($manageRelationships,'show-user-relationships');
+
         app(PermissionRegistrar::class)->registerPermissions();
 
     }
@@ -532,6 +536,22 @@ if (! function_exists('first_or_create_photo')) {
                 'path' => $path
             ])->first();
         }
+    }
+}
+
+if (! function_exists('add_photo_to_first_user')) {
+    function add_photo_to_first_user()
+    {
+        $user = User::findOrFail(1);
+        $person = create(Person::class);
+        $user->persons()->attach($person);
+        $photoPath = Storage::putFileAs(
+            'user_photos', new \Illuminate\Http\File('node_modules/admin-lte/dist/img/avatar.png') ,
+            'avatar.png');
+        $person->photos()->create([
+            'storage' => 'local',
+            'path' => $photoPath
+        ]);
     }
 }
 

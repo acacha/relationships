@@ -2,19 +2,16 @@
 
 namespace Acacha\Relationships\Http\Requests;
 
-use Acacha\Relationships\Http\Requests\Traits\CheckPhotoIsOwnedByUser;
 use Auth;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * Class UpdatePersonPhoto.
+ * Class ShowUserRelationships.
  *
- * @package Acacha\Relationships\Http\Requests
+ * @package App\Http\Requests
  */
-class UpdatePersonPhoto extends FormRequest
+class ShowUserRelationships extends FormRequest
 {
-    use CheckPhotoIsOwnedByUser;
-
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -22,8 +19,8 @@ class UpdatePersonPhoto extends FormRequest
      */
     public function authorize()
     {
-        if (Auth::user()->can('update-person-photo')) return true;
-        if ($this->isPhotoOwnedByUser()) return true;
+        if (Auth::user()->can('show-user-relationships')) return true;
+        if ($this->route('user_id') == Auth::user()->id) return true;
         return false;
     }
 
@@ -35,7 +32,7 @@ class UpdatePersonPhoto extends FormRequest
     public function rules()
     {
         return [
-            'photo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:16384',
+            //
         ];
     }
 }

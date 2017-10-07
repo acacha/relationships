@@ -31,6 +31,9 @@ Via Composer
 $ composer require acacha/relationships
 ```
 
+
+
+
 ## Usage
 
 ``` php

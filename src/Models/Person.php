@@ -67,7 +67,7 @@ class Person extends Model
      */
     public function photos()
     {
-        return $this->hasMany(Photo::class);
+        return $this->hasMany(Photo::class)->orderBy('updated_at', 'DESC');;
     }
 
     /**

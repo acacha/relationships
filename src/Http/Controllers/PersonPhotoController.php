@@ -24,6 +24,11 @@ class PersonPhotoController extends Controller
     const DEFAULT_STORAGE = 'local';
 
     /**
+     * DEFAULT PATH.
+     */
+    const DEFAULT_PATH = 'user_photos';
+
+    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
@@ -42,7 +47,6 @@ class PersonPhotoController extends Controller
     public function store(StorePersonPhoto $request, $id)
     {
         return $this->storePhoto($request, $id);
-
     }
 
 
@@ -125,6 +129,18 @@ class PersonPhotoController extends Controller
     }
 
     /**
+     * Get path prefix.
+     *
+     * @param $request
+     * @return array|string
+     */
+    protected function getPathPrefix($request)
+    {
+        if ($request->has('path')) return $request->input('path');
+        return self::DEFAULT_PATH;
+    }
+
+    /**
      * Get user photo filename.
      *
      * @param $request
@@ -185,12 +201,12 @@ class PersonPhotoController extends Controller
         $person = Person::findOrFail($id);
 
         $path = $request->photo->storeAs(
-            $storage = $this->getStorage($request),
+            $this->getPathPrefix($request),
             $this->getUserPhotoFilename($request, $person)
         );
 
         $photo = $person->photos()->create([
-            'storage' => $storage,
+            'storage' => $this->getStorage($request),
             'path' => $path
         ]);
 

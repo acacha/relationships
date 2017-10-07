@@ -11,11 +11,13 @@ use Acacha\Relationships\Models\Person;
  */
 trait HasPersons
 {
+
     /**
      * Get the phone record associated with the user.
      */
     public function persons()
     {
-        return $this->belongsToMany(Person::class);
+        return $this->belongsToMany(Person::class)->withTimestamps();
     }
+
 }
