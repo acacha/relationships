@@ -2,7 +2,7 @@
 
 namespace Acacha\Relationships\Http\Controllers;
 
-use Acacha\Relationships\Http\Requests\ShowUserRelationships;
+use Acacha\Relationships\Http\Requests\ShowRelationshipsUser;
 use App\User;
 use Auth;
 
@@ -23,18 +23,16 @@ class UserRelationshipsController extends Controller
     }
 
     /**
-     * Display the user relationships.
+     * Display the user info with relationships info.
      *
-     * @param $id
+     * @param ShowRelationshipsUser $request
+     * @param User|null $user
      * @return mixed
      */
-    public function show(ShowUserRelationships $request, $id = null)
+    public function show(ShowRelationshipsUser $request, User $user = null)
     {
-        $user = null;
-        if ($id) $user = User::with(['persons','roles','permissions'])->findOrFail($id);
-        else $user = Auth::user()->with('persons','roles','permissions')->first();
-        return $user;
+        if ($user) return $user->load(['persons'])->append('person');
+        return Auth::user()->load(['persons'])->append('person');
     }
-
 
 }

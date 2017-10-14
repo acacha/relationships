@@ -94,7 +94,7 @@
               component.personId = user.person.id
           } else {
             //TODO
-            //User api doesnot provide person id: use relationships api
+            //User api does not provide person id: use relationships api
           }
           if (component.personId) return this.fetchPhoto()
           if (component.gender === 'female') component.photo = femalePhoto
