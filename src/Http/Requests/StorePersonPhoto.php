@@ -2,7 +2,7 @@
 
 namespace Acacha\Relationships\Http\Requests;
 
-use Acacha\Relationships\Http\Requests\Traits\CheckPhotoIsOwnedByUser;
+use Acacha\Relationships\Http\Requests\Traits\PersonOwns;
 use Auth;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -13,7 +13,8 @@ use Illuminate\Foundation\Http\FormRequest;
  */
 class StorePersonPhoto extends FormRequest
 {
-    use CheckPhotoIsOwnedByUser;
+
+    use PersonOwns;
 
     /**
      * Determine if the user is authorized to make this request.
@@ -23,7 +24,7 @@ class StorePersonPhoto extends FormRequest
     public function authorize()
     {
         if (Auth::user()->can('store-person-photo')) return true;
-        if ($this->isPhotoOwnedByUser()) return true;
+        if ($this->personOwns()) return true;
         return false;
     }
 
@@ -38,4 +39,5 @@ class StorePersonPhoto extends FormRequest
             'photo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:16384',
         ];
     }
+
 }

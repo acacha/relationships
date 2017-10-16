@@ -5,18 +5,19 @@ namespace Acacha\Relationships\Http\Requests\Traits;
 use Auth;
 
 /**
- * Class CheckPhotoIsOwnedByUser.
+ * Trait PersonOwns.
  */
-trait CheckPhotoIsOwnedByUser
+trait PersonOwns
 {
     /**
-     * Is photo owned by user.
+     * Is resource owned by person.
      *
      * @return bool
      */
-    protected function isPhotoOwnedByUser()
+    protected function personOwns()
     {
-        if ( ! $persons = Auth::user()->persons) return false;
+        if ( ! $persons = Auth::user()->persons) abort(404);
+        if ( $persons->count() == 0) abort(404);
         foreach ($persons as $person) {
             if ($person->id == $this->route('id')) return true;
         }

@@ -7,11 +7,11 @@ use Auth;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * Class DestroyPersonPhoto.
+ * Class ListPersonPhoto.
  *
  * @package Acacha\Relationships\Http\Requests
  */
-class DestroyPersonPhoto extends FormRequest
+class ListPersonPhoto extends FormRequest
 {
 
     use PersonOwns;
@@ -23,7 +23,7 @@ class DestroyPersonPhoto extends FormRequest
      */
     public function authorize()
     {
-        if (Auth::user()->can('destroy-person-photo')) return true;
+        if (Auth::user()->can('list-person-photos')) return true;
         if ($this->personOwns()) return true;
         return false;
     }
@@ -35,8 +35,7 @@ class DestroyPersonPhoto extends FormRequest
      */
     public function rules()
     {
-        return [
-            //
-        ];
+        return [];
     }
+
 }

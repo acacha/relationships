@@ -18,17 +18,17 @@ class CreatePeopleTable extends Migration
     {
         Schema::create('people', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name');
-            $table->string('givenName');
-            $table->string('surname');
-            $table->string('surname1');
+            $table->string('name')->nullable();
+            $table->string('givenName')->nullable();
+            $table->string('surname')->nullable();
+            $table->string('surname1')->nullable();
             $table->string('surname2')->nullable();
             $table->date('birthdate')->nullable();
             $table->integer('birthplace_id')->unsigned()->nullable();
             $table->enum('gender',['male','female'])->nullable();
             $table->enum('civil_status',['Soltero/a','Casado/a','Separado/a','Divorciado/a','Viudo/a'])->nullable();
             $table->string('notes')->nullable();
-            $table->unique(['name','birthdate','gender']);
+            $table->enum('state',['draft','valid','completed'])->default('draft');
             $table->timestamps();
         });
 

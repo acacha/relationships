@@ -2,19 +2,18 @@
 
 namespace Acacha\Relationships\Http\Requests;
 
-use Acacha\Relationships\Http\Requests\Traits\PersonOwns;
+use Acacha\Relationships\Http\Requests\Traits\UserOwns;
 use Auth;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * Class DestroyPersonPhoto.
+ * Class StorePhoto.
  *
  * @package Acacha\Relationships\Http\Requests
  */
-class DestroyPersonPhoto extends FormRequest
+class StoreUserPhoto extends FormRequest
 {
-
-    use PersonOwns;
+    use UserOwns;
 
     /**
      * Determine if the user is authorized to make this request.
@@ -23,8 +22,8 @@ class DestroyPersonPhoto extends FormRequest
      */
     public function authorize()
     {
-        if (Auth::user()->can('destroy-person-photo')) return true;
-        if ($this->personOwns()) return true;
+        if (Auth::user()->can('store-person-photo')) return true;
+        if ($this->owns()) return true;
         return false;
     }
 
@@ -36,7 +35,8 @@ class DestroyPersonPhoto extends FormRequest
     public function rules()
     {
         return [
-            //
+            'photo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:16384',
         ];
     }
+
 }

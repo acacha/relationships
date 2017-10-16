@@ -2,6 +2,8 @@
 
 namespace Acacha\Relationships\Models;
 
+use Acacha\Stateful\Contracts\Stateful;
+use Acacha\Stateful\Traits\StatefulTrait;
 use App\User;
 use Illuminate\Database\Eloquent\Model;
 
@@ -10,8 +12,10 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @package Acacha\Relationships\Models
  */
-class Person extends Model
+class Person extends Model implements Stateful
 {
+    use StatefulTrait;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -29,6 +33,41 @@ class Person extends Model
         'civil_status',
         'notes'
     ];
+
+    /**
+     * Transaction States
+     *
+     * @var array
+     */
+    protected $states = [
+        'draft' => ['initial' => true],
+        'valid' => ['final' => true],
+        'completed'
+    ];
+
+    /**
+     * Transaction State Transitions
+     *
+     * @var array
+     */
+    protected $transitions = [
+        'complete' => [
+            'from' => 'draft',
+            'to' => 'completed'
+        ],
+        'validate' => [
+            'from' => ['draft', 'completed'],
+            'to' => 'valid'
+        ]
+    ];
+
+    /**
+     * Create a draft person.
+     */
+    public static function draft()
+    {
+        return static::create([]);
+    }
 
     /**
      * The identifiers that belong to the person.
@@ -67,7 +106,7 @@ class Person extends Model
      */
     public function photos()
     {
-        return $this->hasMany(Photo::class)->orderBy('updated_at', 'DESC');;
+        return $this->hasMany(Photo::class)->orderBy('updated_at', 'DESC');
     }
 
     /**

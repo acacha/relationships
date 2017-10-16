@@ -9,6 +9,7 @@ use Acacha\Relationships\Models\Location;
 use Acacha\Relationships\Models\Person;
 use Acacha\Relationships\Models\Photo;
 use App\User;
+use Illuminate\Http\UploadedFile;
 use Spatie\Permission\PermissionRegistrar;
 
 if (! function_exists('create')) {
@@ -52,10 +53,12 @@ if (! function_exists('initialize_relationships_management_permissions')) {
         give_permission_to_role($manageRelationships,'search-by-identifier');
 
         //PersonPhoto
+        permission_first_or_create('list-person-photos');
         permission_first_or_create('store-person-photo');
         permission_first_or_create('show-person-photo');
         permission_first_or_create('update-person-photo');
         permission_first_or_create('destroy-person-photo');
+        give_permission_to_role($manageRelationships,'list-person-photos');
         give_permission_to_role($manageRelationships,'store-person-photo');
         give_permission_to_role($manageRelationships,'show-person-photo');
         give_permission_to_role($manageRelationships,'update-person-photo');
@@ -539,19 +542,107 @@ if (! function_exists('first_or_create_photo')) {
     }
 }
 
-if (! function_exists('add_photo_to_first_user')) {
-    function add_photo_to_first_user()
-    {
-        $user = User::findOrFail(1);
+if (! function_exists('create_user_with_photo')) {
+    function create_user_with_photo($path) {
+
+    }
+}
+
+if (! function_exists('create_person_with_photo')) {
+    /**
+     * Create Person with photo.
+     *
+     * @param $path
+     * @return mixed
+     */
+    function create_person_with_photo($path = null) {
+        if ( ! $path ) {
+            $path = 'node_modules/admin-lte/dist/img/avatar.png';
+        }
         $person = create(Person::class);
-        $user->persons()->attach($person);
+        add_photo_to_person($path, $person);
+        return $person;
+    }
+}
+
+if (! function_exists('add_photo_to_person')) {
+    /**
+     * Add photo to person.
+     *
+     * @param $path
+     * @param $person
+     */
+    function add_photo_to_person($path, $person)
+    {
+        $filename = str_random(32) . '-' . $person->id .
+        '-' . snake_case($person->name) . '.' . pathinfo($path, PATHINFO_EXTENSION);
         $photoPath = Storage::putFileAs(
-            'user_photos', new \Illuminate\Http\File('node_modules/admin-lte/dist/img/avatar.png') ,
-            'avatar.png');
+            'user_photos', new \Illuminate\Http\File($path) ,
+            $filename);
         $person->photos()->create([
             'storage' => 'local',
-            'path' => $photoPath
+            'path' => $photoPath,
+            'origin' => basename($path)
         ]);
+    }
+}
+
+if (! function_exists('add_photo_to_first_user')) {
+    /**
+     * Add photo to first user.
+     *
+     * @param string $photo
+     */
+    function add_photo_to_first_user($photo = 'node_modules/admin-lte/dist/img/avatar.png')
+    {
+        $user = User::findOrFail(1);
+
+        add_photo_to_user($user, $photo);
+    }
+}
+
+if (! function_exists('add_photo_to_user')) {
+    /**
+     * Add photo to user.
+     *
+     * @param $user
+     * @param string $photo
+     */
+    function add_photo_to_user($user, $photo = 'node_modules/admin-lte/dist/img/avatar.png')
+    {
+        $person = $user->person;
+        if (! $person) {
+            $person = create(Person::class);
+            $user->persons()->attach($person);
+        }
+        add_photo_to_person($photo, $person);
+    }
+}
+
+
+if (! function_exists('remove_photo_to_first_user')) {
+    /**
+     * Remove photo to _first_user
+     */
+    function remove_photo_to_first_user()
+    {
+        $user = User::findOrFail(1);
+        remove_photo_to_user($user);
+    }
+}
+
+if (! function_exists('remove_photo_to_user')) {
+    /**
+     * Remove photo to user
+     */
+    function remove_photo_to_user($user)
+    {
+        $person = $user->persons()->first();
+        if ($person) {
+            $photo = Photo::where('person_id',$person->id)->first();
+            Storage::delete($photo->path);
+            $user->persons()->detach();
+        }
     }
 }
 

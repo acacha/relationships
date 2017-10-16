@@ -16,7 +16,7 @@ class Photo extends Model
      *
      * @var array
      */
-    protected $fillable = [ 'storage', 'path', 'order', 'person_id' ];
+    protected $fillable = [ 'storage', 'path', 'origin' , 'order', 'person_id' ];
 
     /**
      * Get the person that owns the photo.

@@ -2,20 +2,16 @@
 
 namespace Acacha\Relationships\Http\Requests;
 
-use Acacha\Relationships\Http\Requests\Traits\PersonOwns;
 use Auth;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * Class DestroyPersonPhoto.
+ * Class ShowUserRelationships.
  *
- * @package Acacha\Relationships\Http\Requests
+ * @package App\Http\Requests
  */
-class DestroyPersonPhoto extends FormRequest
+class ShowRelationshipsUser extends FormRequest
 {
-
-    use PersonOwns;
-
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -23,9 +19,12 @@ class DestroyPersonPhoto extends FormRequest
      */
     public function authorize()
     {
-        if (Auth::user()->can('destroy-person-photo')) return true;
-        if ($this->personOwns()) return true;
-        return false;
+        if (Auth::user()->can('show-user-relationships')) return true;
+        if ($user = $this->route('user')) {
+            if ($user->id == Auth::user()->id) return true;
+            else return false;
+        }
+        return true;
     }
 
     /**
