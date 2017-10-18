@@ -31,6 +31,7 @@ class RelationshipsProvider extends ServiceProvider
 
         //Loading
         $this->loadMigrations();
+
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Acacha\Relationships\Http\Controllers;
 
+use Acacha\Relationships\Http\Requests\DisplayPhotoRequest;
 use Acacha\Relationships\Models\Person;
 use Acacha\Relationships\Models\Photo;
 use Storage;
@@ -22,6 +23,17 @@ class PhotoController extends Controller
      * DEFAULT PATH.
      */
     const DEFAULT_PATH = 'user_photos';
+
+    /**
+     * Display the photo.
+     *
+     * @param Photo $photo
+     * @return mixed
+     */
+    public function display(DisplayPhotoRequest $request, Photo $photo)
+    {
+        return $this->showPhoto($photo);
+    }
 
     /**
      * Remove photo.

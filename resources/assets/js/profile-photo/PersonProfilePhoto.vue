@@ -21,6 +21,8 @@
                                         <template v-if="isSuccessRemoving">Uploaded</template>
                                         <template v-if="isFailed">Error</template>
                                         <template v-if="isRemoving">Removing</template>
+                                        <template v-if="isFailedRemoving">Error</template>
+                                        <template v-if="isLoadingPhotos">Loading</template>
                                     </b>
                                 </label>
                                 <input type="file" name="photo" id="file-input" ref="photo" accept="image/*" :disabled="isSaving"
@@ -53,14 +55,17 @@
                             <h4 class="modal-title">Manage photos</h4>
                         </div>
                         <div class="modal-body">
-                            <ul class="users-list clearfix">
-                                <li v-for="photo in photos">
-                                    <img src="http://lorempixel.com/180/180/" alt="User Image">
-                                    <a class="users-list-name" href="#">{{ photo.origin }}</a>
-                                    <span class="users-list-date">{{ photo.updated_at }}</span>
-                                </li>
 
+                            <ul class="users-list clearfix" v-if="!isLoadingPhotos">
+                                <li v-for="photo in photos">
+                                    <img :src="'/person/' + photo.person_id + '/photo'" alt="User Image" @dblclick="updatePhoto">
+                                    <a class="users-list-name" href="#" :title="photo.path">{{ photo.origin }}</a>
+                                    <span class="users-list-date" title="Updated at">{{ photo.updated_at }}</span>
+                                    <span class="users-list-date" title="Created at">{{ photo.created_at }}</span>
+                                    <i class="fa fa-remove fa-lg red" @click="removePhoto"></i>
+                                </li>
                             </ul>
+                            <div v-else><i class="fa fa-refresh fa-spin fa-lg"></i> Loading photos...</div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
@@ -93,19 +98,9 @@
         display: inline;
         min-width: 70px;
     }
-    /*.manage-photos-modal .modal {*/
-        /*position: relative;*/
-        /*top: auto;*/
-        /*bottom: auto;*/
-        /*right: auto;*/
-        /*left: auto;*/
-        /*display: block;*/
-        /*z-index: 1;*/
-    /*}*/
-
-    /*.manage-photos-modal .modal {*/
-        /*background: transparent !important;*/
-    /*}*/
+    .red {
+        color: red;
+    }
 </style>
 
 <script>
@@ -116,8 +111,8 @@
   import { wait, checkImage } from '../utils'
 
   const STATUS_INITIAL = 0, STATUS_INITIAL_ERROR = 1, STATUS_SAVING = 2, STATUS_SUCCESS = 3, STATUS_FAILED = 4,
-    STATUS_REMOVING = 5, STATUS_REMOVE_FAILED = 6, STATUS_REMOVING_SUCCESS = 6;
-
+    STATUS_REMOVING = 5, STATUS_REMOVE_FAILED = 6, STATUS_REMOVING_SUCCESS = 6, STATUS_LOADING_PHOTOS = 7,
+    STATUS_LOADING_FAILED = 8;
 
     export default {
     mixins: [
@@ -129,37 +124,7 @@
         personId: null,
         photoPath: defaultMalePhoto,
         currentStatus: null,
-//        photos: []
-        photos: [
-          {
-            id : 1,
-            origin: 'origin1',
-            path: 'path1',
-            created_at: 'date1',
-            updated_at: 'date1'
-          },
-          {
-            id : 2,
-            origin: 'origin2',
-            path: 'path2',
-            created_at: 'date2',
-            updated_at: 'date2'
-          },
-          {
-            id : 3,
-            origin: 'origin3',
-            path: 'path3',
-            created_at: 'date3',
-            updated_at: 'date3'
-          },
-          {
-            id : 4,
-            origin: 'origin4',
-            path: 'path4',
-            created_at: 'date4',
-            updated_at: 'date4'
-          },
-        ]
+        photos: []
       }
     },
     props: {
@@ -199,6 +164,16 @@
       },
       isFailed() {
         return this.currentStatus === STATUS_FAILED
+      },
+      isFailedRemoving() {
+        return this.currentStatus === STATUS_REMOVE_FAILED
+      },
+      isLoadingPhotos() {
+        return this.currentStatus === STATUS_LOADING_PHOTOS
+      }
+      ,
+      isLoadingFailed() {
+        return this.currentStatus === STATUS_LOADING_FAILED
       }
     },
     watch: {
@@ -214,6 +189,7 @@
     methods: {
       updatePhotoUrl(personId) {
         this.photoPath = '/person/' + personId + '/photo?timestamp=' + new Date().getTime()
+        if (this.currentStatus === STATUS_INITIAL_ERROR) this.currentStatus === STATUS_INITIAL
       },
       showDefaultPhoto() {
         this.gender === 'female' ? this.photoPath = defaultFemalePhoto : this.photoPath = defaultMalePhoto
@@ -295,7 +271,7 @@
         this.currentStatus = STATUS_REMOVING
         let deletePhotoURL = '/api/v1/user/' + this.user + '/photo'
         if ( this.personId ) deletePhotoURL = '/api/v1/person/' + this.personId + '/photo'
-        var component = this
+        let component = this
         axios.delete(deletePhotoURL)
           .then(wait(1000))
           .then(function (res) {
@@ -304,12 +280,31 @@
           })
           .catch(function (error) {
             console.log(error)
-            component.currentStatus = STATUS_FAILED
+            component.currentStatus = STATUS_REMOVE_FAILED
           })
       },
       manage() {
-        console.log('manage')
-      }
+        this.currentStatus = STATUS_LOADING_PHOTOS
+        let showPhotosURL = '/api/v1/user/' + this.user + '/photos'
+        if ( this.personId ) showPhotosURL = '/api/v1/person/' + this.personId + '/photos'
+        let component = this
+        axios.get(showPhotosURL)
+          .then(wait(1000)).then(function (res) {
+              component.photos = res.data
+              component.currentStatus = STATUS_INITIAL
+            }).catch(
+          function (error) {
+            console.log(error)
+            component.currentStatus = STATUS_LOADING_FAILED
+          }
+        ).then()
+      },
+      updatePhoto() {
+        console.log('TODO update photo')
+      },
+      removePhoto() {
+        console.log('TODO remove photo')
+      },
     }
   }
 </script>

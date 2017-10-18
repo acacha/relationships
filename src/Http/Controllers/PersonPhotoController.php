@@ -7,9 +7,7 @@ use Acacha\Relationships\Http\Requests\ShowPersonPhoto;
 use Acacha\Relationships\Http\Requests\StorePersonPhoto;
 use Acacha\Relationships\Http\Requests\UpdatePersonPhoto;
 use Acacha\Relationships\Models\Person;
-use Acacha\Relationships\Models\Photo;
 use Illuminate\Http\Request;
-use Storage;
 
 /**
  * Class PersonPhotoController.

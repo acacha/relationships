@@ -64,6 +64,10 @@ if (! function_exists('initialize_relationships_management_permissions')) {
         give_permission_to_role($manageRelationships,'update-person-photo');
         give_permission_to_role($manageRelationships,'destroy-person-photo');
 
+        //PhotoController
+        permission_first_or_create('show-photos');
+        give_permission_to_role($manageRelationships,'show-photos');
+
         //User Relationships
         permission_first_or_create('show-user-relationships');
         give_permission_to_role($manageRelationships,'show-user-relationships');
