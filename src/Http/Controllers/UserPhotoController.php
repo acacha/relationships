@@ -30,7 +30,7 @@ class UserPhotoController extends PhotoController
             $user->persons()->attach($person = Person::draft());
             $person_id = $person->id;
         }
-        return $this->storePhoto($request, $person_id);
+        return $this->storePersonPhoto($request, $person_id);
     }
 
 }

@@ -7,6 +7,7 @@ use Acacha\Relationships\Http\Requests\ShowPersonPhoto;
 use Acacha\Relationships\Http\Requests\StorePersonPhoto;
 use Acacha\Relationships\Http\Requests\UpdatePersonPhoto;
 use Acacha\Relationships\Models\Person;
+use Acacha\Relationships\Models\Photo;
 use Illuminate\Http\Request;
 
 /**
@@ -35,7 +36,7 @@ class PersonPhotoController extends PhotoController
      */
     public function store(StorePersonPhoto $request, $id)
     {
-        return $this->storePhoto($request, $id);
+        return $this->storePersonPhoto($request, $id);
     }
 
     /**
@@ -58,12 +59,12 @@ class PersonPhotoController extends PhotoController
      * Update the specified resource in storage.
      *
      * @param UpdatePersonPhoto $request
-     * @param $id
+     * @param Photo $photo
      * @return mixed
      */
-    public function update(UpdatePersonPhoto $request, $id)
+    public function update(UpdatePersonPhoto $request, Photo $photo)
     {
-        return $this->storePhoto($request, $id);
+        return $this->updatePhoto($request, $photo);
     }
 
     /**

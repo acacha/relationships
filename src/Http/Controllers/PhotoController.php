@@ -2,6 +2,7 @@
 
 namespace Acacha\Relationships\Http\Controllers;
 
+use Acacha\Relationships\Http\Requests\DeletePhotoRequest;
 use Acacha\Relationships\Http\Requests\DisplayPhotoRequest;
 use Acacha\Relationships\Models\Person;
 use Acacha\Relationships\Models\Photo;
@@ -27,12 +28,36 @@ class PhotoController extends Controller
     /**
      * Display the photo.
      *
+     * @param DisplayPhotoRequest $request
      * @param Photo $photo
      * @return mixed
      */
     public function display(DisplayPhotoRequest $request, Photo $photo)
     {
         return $this->showPhoto($photo);
+    }
+
+    /**
+     * Destroy the photo.
+     *
+     * @param Photo $photo
+     * @return mixed
+     */
+    public function delete(DeletePhotoRequest $request, Photo $photo)
+    {
+        $this->removePhoto($photo);
+        return $photo;
+    }
+
+    /**
+     * Update the photo.
+     *
+     * @param Photo $photo
+     * @return mixed
+     */
+    public function put(PutPhotoRequest $request, Photo $photo)
+    {
+        return $this->storePersonPhoto($request, $photo);
     }
 
     /**
@@ -128,13 +153,37 @@ class PhotoController extends Controller
      * @param $id
      * @return mixed
      */
-    protected function storePhoto($request, $id)
+    protected function storePersonPhoto($request, $id)
     {
         $person = Person::findOrFail($id);
 
         $path = $request->photo->storeAs(
             $this->getPathPrefix($request),
             $this->getUserPhotoFilename($request, $person)
+        );
+
+        $photo = $person->photos()->create([
+            'storage' => $this->getStorage($request),
+            'path' => $path,
+            'origin' => $request->photo->getClientOriginalName()
+        ]);
+
+        return $photo;
+    }
+
+    /**
+     * Update photo.
+     *
+     * @param $request
+     * @param $photo
+     * @return mixed
+     */
+    protected function updatePhoto($request, $photo)
+    {
+        if ( ! $photo instanceof Photo) $photo = Photo::findOrFail($photo);
+        $path = $request->photo->storeAs(
+            $this->getPathPrefix($request),
+            $this->getUserPhotoFilename($request, $person = Person::findOrFail($photo->person_id))
         );
 
         $photo = $person->photos()->create([

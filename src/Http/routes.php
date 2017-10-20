@@ -22,6 +22,11 @@ Route::group(['middleware' => 'api','prefix' => 'api/v1', 'middleware' => ['thro
         //Upload a photo for a non existing person
         Route::post('/user/{id}/photo',      'UserPhotoController@store');
 
+        //PhotosController
+        Route::delete('/photos/{photo}',     'PhotoController@delete');
+        Route::put('/photos/{photo}',        'PhotoController@put');
+        Route::patch('/photos/{photo}',      'PhotoController@put');
+
     });
 
     Route::group(['middleware' => 'auth:api'], function() {

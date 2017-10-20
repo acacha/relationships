@@ -19,7 +19,7 @@
                                         <template v-if="isSaving">Uploading</template>
                                         <template v-if="isSuccess">Uploaded</template>
                                         <template v-if="isSuccessRemoving">Uploaded</template>
-                                        <template v-if="isFailed">Error</template>
+                                        <template v-if="isFailed || isLoadingFailed">Error</template>
                                         <template v-if="isRemoving">Removing</template>
                                         <template v-if="isFailedRemoving">Error</template>
                                         <template v-if="isLoadingPhotos">Loading</template>
@@ -55,14 +55,24 @@
                             <h4 class="modal-title">Manage photos</h4>
                         </div>
                         <div class="modal-body">
-
                             <ul class="users-list clearfix" v-if="!isLoadingPhotos">
-                                <li v-for="photo in photos">
-                                    <img :src="'/person/' + photo.person_id + '/photo'" alt="User Image" @dblclick="updatePhoto">
+                                <li v-for="(photo,index) in photos">
+                                    <img ref='photoUpdateImage' :src="'/photos/' + photo.id" alt="User Image" @dblclick="update(index)">
+                                    <form role="form" class="form" onsubmit="return false;">
+                                        <input type="file" name="photo" ref="photoUpdate" accept="image/*"
+                                               @change="photoUpdateChange( photo, index, $event)" style="display: none;">
+                                    </form>
+
                                     <a class="users-list-name" href="#" :title="photo.path">{{ photo.origin }}</a>
                                     <span class="users-list-date" title="Updated at">{{ photo.updated_at }}</span>
                                     <span class="users-list-date" title="Created at">{{ photo.created_at }}</span>
-                                    <i class="fa fa-remove fa-lg red" @click="removePhoto"></i>
+
+                                    <i class="fa fa-refresh fa-spin fa-lg" v-if="photoBeingRemoved === photo.id"></i>
+                                    <span v-if="photoBeingConfirmed === photo.id">
+                                        Sure? <i class="fa fa-check green" @click="removePhoto(photo)"></i> <i class="fa fa-remove red" @click="photoBeingConfirmed = null;" ></i>
+                                    </span>
+                                    <i class="fa fa-remove fa-lg red" @click="confirmRemovePhoto(photo)" v-if="photoBeingConfirmed != photo.id && photoBeingRemoved != photo.id"></i>
+
                                 </li>
                             </ul>
                             <div v-else><i class="fa fa-refresh fa-spin fa-lg"></i> Loading photos...</div>
@@ -101,6 +111,9 @@
     .red {
         color: red;
     }
+    .green {
+        color: green;
+    }
 </style>
 
 <script>
@@ -124,7 +137,9 @@
         personId: null,
         photoPath: defaultMalePhoto,
         currentStatus: null,
-        photos: []
+        photos: [],
+        photoBeingRemoved: null,
+        photoBeingConfirmed: null
       }
     },
     props: {
@@ -170,8 +185,7 @@
       },
       isLoadingPhotos() {
         return this.currentStatus === STATUS_LOADING_PHOTOS
-      }
-      ,
+      },
       isLoadingFailed() {
         return this.currentStatus === STATUS_LOADING_FAILED
       }
@@ -213,14 +227,34 @@
         }
       },
       upload() {
+        console.log(this.$refs.photo)
         this.$refs.photo.click()
+      },
+      update(index) {
+        console.log(this.$refs.photoUpdate[index])
+        this.$refs.photoUpdate[index].click()
+      },
+      photoUpdateChange(photo, index, event) {
+
+        var target = event.target || event.srcElement;
+        if (target.value.length != 0) {
+          // handle input photo changes
+          const formData = new FormData()
+          formData.append('photo', this.$refs.photoUpdate[index].files[0])
+
+          //Preview it
+          this.previewOnManagePhotos(index)
+
+          // save it
+          this.saveUpdate(photo,formData)
+        }
       },
       photoChange(event) {
         var target = event.target || event.srcElement;
         if (target.value.length != 0) {
           // handle input photo changes
           const formData = new FormData()
-          formData.append('photo', this.$refs.photo.files[0])
+          formData.append('photo', this.$refs.photoUpdate[index].files[0])
 
           //Preview it
           this.preview()
@@ -239,6 +273,37 @@
 
           reader.readAsDataURL(this.$refs.photo.files[0]);
         }
+      },
+      previewOnManagePhotos(index) {
+        if (this.$refs.photoUpdate[index].files && this.$refs.photoUpdate[index].files[0]) {
+          var reader = new FileReader();
+          var component = this
+          reader.onload = function (e) {
+            component.$refs.photoUpdateImage[index].setAttribute('src', e.target.result);
+          }
+
+          reader.readAsDataURL(this.$refs.photoUpdate[index].files[0]);
+        }
+      },
+      saveUpdate(photo, formData) {
+        this.currentStatus = STATUS_SAVING
+        let uploadPhotoURL = '/api/v1/photos/' + photo.id
+
+        var component = this
+        var config = {
+          onUploadProgress: function(progressEvent) {
+            var percentCompleted = Math.round( (progressEvent.loaded * 100) / progressEvent.total )
+          }
+        }
+
+        axios.put(uploadPhotoURL, formData, config)
+          .then(function (res) {
+            component.currentStatus = STATUS_SUCCESS
+          })
+          .catch(function (error) {
+            console.log(error)
+            component.currentStatus = STATUS_FAILED
+          })
       },
       save(formData) {
         this.currentStatus = STATUS_SAVING
@@ -289,7 +354,7 @@
         if ( this.personId ) showPhotosURL = '/api/v1/person/' + this.personId + '/photos'
         let component = this
         axios.get(showPhotosURL)
-          .then(wait(1000)).then(function (res) {
+          .then(function (res) {
               component.photos = res.data
               component.currentStatus = STATUS_INITIAL
             }).catch(
@@ -302,8 +367,29 @@
       updatePhoto() {
         console.log('TODO update photo')
       },
-      removePhoto() {
-        console.log('TODO remove photo')
+      confirmRemovePhoto(photo) {
+        this.photoBeingConfirmed = photo.id
+      },
+      removePhoto(photo) {
+        this.photoBeingRemoved = photo.id
+        this.photoBeingConfirmed = null
+        let removePhotoURL = '/api/v1/photos/' + photo.id
+        let component = this
+        console.log(removePhotoURL)
+        axios.delete(removePhotoURL)
+          .then(wait(1000)).then(function (res) {
+          console.log('Removed photo:')
+          console.log(res.data)
+          component.photos.splice(component.photos.indexOf(photo), 1)
+          component.currentStatus = STATUS_INITIAL
+        }).catch(
+          function (error) {
+            console.log(error)
+            component.currentStatus = STATUS_REMOVING_FAILED
+          }
+        ).then(function() {
+          component.photoBeingRemoved = null
+        })
       },
     }
   }
