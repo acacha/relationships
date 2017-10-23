@@ -16,16 +16,17 @@ Route::group(['middleware' => 'api','prefix' => 'api/v1', 'middleware' => ['thro
         Route::get('/person/{id}/photos',       'PersonPhotoController@index');
         Route::get('/person/{id}/photo',        'PersonPhotoController@show');
         Route::post('/person/{id}/photo',       'PersonPhotoController@store');
-        Route::put('/person/{id}/photo',        'PersonPhotoController@update');
+        Route::put('/person/{person}/photo',    'PersonPhotoController@update');
         Route::delete('/person/{id}/photo',     'PersonPhotoController@destroy');
 
         //Upload a photo for a non existing person
-        Route::post('/user/{id}/photo',      'UserPhotoController@store');
+        Route::post('/user/{user}/photo',      'UserPhotoController@store');
+        //Show photos for a non existing person
+        Route::get('/user/{user}/photos',      'UserPhotoController@index');
 
         //PhotosController
         Route::delete('/photos/{photo}',     'PhotoController@delete');
-        Route::put('/photos/{photo}',        'PhotoController@put');
-        Route::patch('/photos/{photo}',      'PhotoController@put');
+        Route::post('/photos/{photo}',        'PhotoController@post');
 
     });
 

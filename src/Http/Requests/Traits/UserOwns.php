@@ -16,7 +16,7 @@ trait UserOwns
      */
     protected function owns($id = null)
     {
-        $id ?: $id = $this->route('id');
+        $id ?: $id = $this->user->id;
         if (Auth::user()->id == $id) return true;
         return false;
     }

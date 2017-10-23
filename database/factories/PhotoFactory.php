@@ -6,9 +6,14 @@ use App\User;
 use Faker\Generator as Faker;
 
 $factory->define(Photo::class, function (Faker $faker) {
-    $user = factory(User::class)->create();
-    $person = factory(Person::class)->create();
-    $user->persons()->attach($person->id);
+    if ( ! array_key_exists('person_id',$attributes = func_get_arg(1))) {
+        $user = factory(User::class)->create();
+        $person = factory(Person::class)->create();
+        $user->persons()->attach($person->id);
+    } else {
+        $person = Person::findOrFail($attributes['person_id']);
+    }
+
     return [
       'storage' => 'local',
       'origin' => $faker->unique()->word . '.png',

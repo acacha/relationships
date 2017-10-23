@@ -36,7 +36,7 @@ class StorePersonPhoto extends FormRequest
     public function rules()
     {
         return [
-            'photo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:16384',
+            'file' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:16384',
         ];
     }
 

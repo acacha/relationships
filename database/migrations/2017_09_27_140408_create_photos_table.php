@@ -21,11 +21,10 @@ class CreatePhotosTable extends Migration
             $table->string('storage');
             $table->string('origin');
             $table->string('path');
-            $table->tinyInteger('order')->nullable();
             $table->integer('person_id')->unsigned()->nullable();
 
             $table->unique(['storage', 'path']);
-            $table->unique(['order', 'person_id']);
+            $table->unique(['path', 'person_id']);
             $table->timestamps();
         });
     }

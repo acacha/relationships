@@ -59,12 +59,12 @@ class PersonPhotoController extends PhotoController
      * Update the specified resource in storage.
      *
      * @param UpdatePersonPhoto $request
-     * @param Photo $photo
+     * @param Person $person
      * @return mixed
      */
-    public function update(UpdatePersonPhoto $request, Photo $photo)
+    public function update(UpdatePersonPhoto $request, Person $person)
     {
-        return $this->updatePhoto($request, $photo);
+        return $this->updatePersonPrimaryPhoto($request, $person->photos()->firstOrFail());
     }
 
     /**

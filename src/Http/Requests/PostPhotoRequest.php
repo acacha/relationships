@@ -6,12 +6,13 @@ use Acacha\Relationships\Http\Requests\Traits\PersonOwns;
 use Auth;
 use Illuminate\Foundation\Http\FormRequest;
 
+
 /**
- * Class UpdatePersonPhoto.
+ * Class PutPhotoRequest.
  *
  * @package Acacha\Relationships\Http\Requests
  */
-class UpdatePersonPhoto extends FormRequest
+class PostPhotoRequest extends FormRequest
 {
     use PersonOwns;
 
@@ -22,8 +23,8 @@ class UpdatePersonPhoto extends FormRequest
      */
     public function authorize()
     {
-        if (Auth::user()->can('update-person-photo')) return true;
-        if ($this->personOwns()) return true;
+        if (Auth::user()->can('post-photos')) return true;
+        if ($this->personOwns($this->photo->person_id)) return true;
         return false;
     }
 
