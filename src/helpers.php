@@ -76,6 +76,14 @@ if (! function_exists('initialize_relationships_management_permissions')) {
         permission_first_or_create('show-user-relationships');
         give_permission_to_role($manageRelationships,'show-user-relationships');
 
+        //Identifiers
+        permission_first_or_create('list-identifiers');
+        give_permission_to_role($manageRelationships,'list-identifiers');
+
+        //Search identifiers
+        permission_first_or_create('search-identifiers');
+        give_permission_to_role($manageRelationships,'search-identifiers');
+
         app(PermissionRegistrar::class)->registerPermissions();
 
     }
@@ -215,7 +223,6 @@ if (! function_exists('seed_identifier_types')) {
         first_or_create_identifier_type('Pasaporte');
         first_or_create_identifier_type('NIE');
         first_or_create_identifier_type('TIS');
-        first_or_create_identifier_type('TODO');
     }
 }
 
@@ -226,6 +233,16 @@ if (! function_exists('seed_identifiers')) {
     function seed_identifiers()
     {
         Artisan::call('seed:identifiers');
+    }
+}
+
+if (! function_exists('seed_random_nif_identifiers')) {
+    /**
+     * Create identifiers.
+     */
+    function seed_random_nif_identifiers($number = 100)
+    {
+        factory(Identifier::class,$number)->states('nif')->create();
     }
 }
 
@@ -658,6 +675,9 @@ if (! function_exists('remove_photo_to_user')) {
 if (! function_exists('seed_relationships')) {
     function seed_relationships()
     {
+        //Import from ebre-escool
+        ///usr/bin/ssh -o StrictHostKeyChecking=no  -N -i /home/sergi/.ssh/id_rsa -L 14852:127.0.0.1:3306 -p 22 sergi@192.168.50.180
+
         seed_identifier_types();
         seed_contact_types();
         seed_identifiers();

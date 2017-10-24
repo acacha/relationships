@@ -2,9 +2,9 @@
 
 namespace Acacha\Relationships\Http\Controllers;
 
-use Acacha\Relationships\Http\Requests\DeletePhotoRequest;
-use Acacha\Relationships\Http\Requests\DisplayPhotoRequest;
-use Acacha\Relationships\Http\Requests\PostPhotoRequest;
+use Acacha\Relationships\Http\Requests\DeletePhoto;
+use Acacha\Relationships\Http\Requests\DisplayPhoto;
+use Acacha\Relationships\Http\Requests\PostPhoto;
 use Acacha\Relationships\Models\Person;
 use Acacha\Relationships\Models\Photo;
 use Storage;
@@ -28,11 +28,11 @@ class PhotoController extends Controller
     /**
      * Display the photo.
      *
-     * @param DisplayPhotoRequest $request
+     * @param DisplayPhoto $request
      * @param Photo $photo
      * @return mixed
      */
-    public function display(DisplayPhotoRequest $request, Photo $photo)
+    public function display(DisplayPhoto $request, Photo $photo)
     {
         return $this->showPhoto($photo);
     }
@@ -43,7 +43,7 @@ class PhotoController extends Controller
      * @param Photo $photo
      * @return mixed
      */
-    public function delete(DeletePhotoRequest $request, Photo $photo)
+    public function delete(DeletePhoto $request, Photo $photo)
     {
         $this->removePhoto($photo);
         return $photo;
@@ -52,11 +52,11 @@ class PhotoController extends Controller
     /**
      * Post the photo.
      *
-     * @param PostPhotoRequest $request
+     * @param PostPhoto $request
      * @param Photo $photo
      * @return mixed
      */
-    public function post(PostPhotoRequest $request, Photo $photo)
+    public function post(PostPhoto $request, Photo $photo)
     {
         return $this->postPhoto($request, $photo);
     }

@@ -1,0 +1,25 @@
+{
+  "name": "acacha-relationships",
+  "version": "0.1.0",
+  "description": "Acacha relationships",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/acacha/relationships.git"
+  },
+  "author": "Sergi Tur Badenas <sergiturbadenas@gmail.com> (http://acacha.org)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/acacha/relationships/issues"
+  },
+  "homepage": "https://github.com/acacha/relationships#readme",
+  "dependencies": {
+    "vue-typeahead": "^2.3.2"
+  }
+}

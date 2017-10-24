@@ -20,13 +20,23 @@ Route::group(['middleware' => 'api','prefix' => 'api/v1', 'middleware' => ['thro
         Route::delete('/person/{id}/photo',     'PersonPhotoController@destroy');
 
         //Upload a photo for a non existing person
-        Route::post('/user/{user}/photo',      'UserPhotoController@store');
+        Route::post('/user/{user}/photo',       'UserPhotoController@store');
         //Show photos for a non existing person
-        Route::get('/user/{user}/photos',      'UserPhotoController@index');
+        Route::get('/user/{user}/photos',       'UserPhotoController@index');
 
         //PhotosController
-        Route::delete('/photos/{photo}',     'PhotoController@delete');
-        Route::post('/photos/{photo}',        'PhotoController@post');
+        Route::delete('/photos/{photo}',        'PhotoController@delete');
+        Route::post('/photos/{photo}',          'PhotoController@post');
+
+
+        //IdentifierTypes
+        Route::get('/identifierType',           'IdentifierTypeController@index');
+
+        //Identifier search
+        Route::get('/identifier/search',        'IdentifierSearchController@index');
+
+        //Identifiers
+        Route::get('/identifier',        'IdentifierController@index');
 
     });
 
