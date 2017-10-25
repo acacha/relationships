@@ -2,22 +2,9 @@
 
 use Acacha\Relationships\Models\Location;
 use Acacha\Relationships\Models\Person;
+use Carbon\Carbon;
 use Faker\Factory;
 use Faker\Generator as Faker;
-
-$factory->define(Location::class, function (Faker $faker) {
-    return [
-        'name' => $faker->city,
-        'postalcode' => $faker->postcode
-    ];
-});
-
-$factory->state(Location::class,'es', function (Faker $faker) {
-    return [
-        'name' => $faker->city,
-        'postalcode' => $faker->postcode
-    ];
-});
 
 $factory->define(Person::class, function (Faker $faker) {
 
@@ -26,9 +13,7 @@ $factory->define(Person::class, function (Faker $faker) {
     $surname1 = $faker->lastName;
 
     return [
-        'name' => $givenName . ' ' . $surname1,
         'givenName' => $givenName,
-        'surname' => $surname1,
         'surname1' => $surname1,
         'surname2' => '',
         'birthdate' => $faker->date,
@@ -65,3 +50,29 @@ $factory->state(Person::class, 'es', function ($faker) {
         'notes' => $faker->sentence
     ];
 });
+
+$factory->state(Person::class, 'ca', function ($faker) {
+
+    $faker = Factory::create('es_ES');
+
+    $gender = $faker->randomElements(['male', 'female']);
+    $givenName = $faker->firstName($gender);
+    $surname1 = $faker->lastName;
+    $surname2 = $faker->lastName;
+
+    $faker->addProvider(new \Acacha\Relationships\Faker\Providers\CatalanLocation($faker));
+
+    $location = factory(Location::class)->create();
+
+    return [
+        'givenName' => $givenName,
+        'surname1' => $surname1,
+        'surname2' => $surname2,
+        'birthdate' => Carbon::createFromTimestamp($faker->dateTimeInInterval('-80 years', '-14 years')->getTimestamp())->toDateString(),
+        'birthplace_id' => $location->id,
+        'gender' => $gender[0],
+        'state' => 'valid'
+    ];
+});
+
+

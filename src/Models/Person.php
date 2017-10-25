@@ -31,8 +31,23 @@ class Person extends Model implements Stateful
         'birthplace_id',
         'gender',
         'civil_status',
-        'notes'
+        'notes',
+        'state'
     ];
+
+    /**
+     * The relationships to eager load.
+     *
+     * @var array
+     */
+    public $with = ['identifiers','birthplace'];
+
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = ['identifier','birthplace-name'];
 
     /**
      * Transaction States
@@ -62,11 +77,61 @@ class Person extends Model implements Stateful
     ];
 
     /**
+     * Get the persons's fullname.
+     *
+     * @return string
+     */
+    public function getNameAttribute()
+    {
+        return $this->givenName . ' ' . $this->surname1 . ' ' . $this->surname2;
+    }
+
+    /**
+     * Get the persons's identifier.
+     *
+     * @return string
+     */
+    public function getIdentifierAttribute()
+    {
+        return $this->identifiers->first() ? $this->identifiers->first()->value : '';
+    }
+
+    /**
+     * Get the persons's identifier.
+     *
+     * @return string
+     */
+    public function getBirthplaceNameAttribute()
+    {
+        return $this->birthplace ? $this->birthplace->name : '';
+    }
+
+    /**
+     * Scope a query to only include active persons.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeFinished($query)
+    {
+        //Completed and validated ones
+        return $query->where('state', 'completed')->orWhere('state', 'valid');
+    }
+
+    /**
      * Create a draft person.
      */
     public static function draft()
     {
         return static::create([]);
+    }
+
+    /**
+     * The birthplace that belong to the person.
+     */
+    public function birthplace()
+    {
+        return $this->belongsTo(Location::class,'birthplace_id');
     }
 
     /**
@@ -117,14 +182,4 @@ class Person extends Model implements Stateful
         return $this->hasOne(PersonMigrationInfo::class);
     }
 
-    /**
-     * Get the person's DNI.
-     *
-     * @param  string  $value
-     * @return string
-     */
-    public function getDniAttribute($value)
-    {
-
-    }
 }

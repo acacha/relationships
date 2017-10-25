@@ -13,24 +13,14 @@
             </div>
             <div class="box-body">
                 <div class="row">
-                    <div class="col-md-2">
-                        <div class="form-group">
-                            <label for="givenName">Identifier</label>
-                            <div class="input-group">
-                                <div class="input-group-btn">
-                                    <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">DNI
-                                        <span class="fa fa-caret-down"></span></button>
-                                    <ul class="dropdown-menu">
-                                        <li><a href="#">DNI</a></li>
-                                        <li><a href="#">Pasaport</a></li>
-                                        <li><a href="#">NIE</a></li>
-                                    </ul>
-                                </div>
-                                <input type="text" class="form-control">
-                            </div>
-
-                        </div>
+                    <div class="col-md-5">
+                        <identifier-select @selected="IdentifierSelected"></identifier-select>
                     </div>
+                    <div class="col-md-7">
+                        <fullname-select @selected="fullNameSelected"></fullname-select>
+                    </div>
+                </div>
+                <div class="row">
                     <div class="col-md-4">
                         <div class="form-group has-feedback" :class="{ 'has-error': form.errors.has('givenName') }">
                             <label for="givenName">Given name</label>
@@ -83,6 +73,9 @@
 
                 </div>
             </div>
+            <div class="overlay" v-show="isLoading">
+                <i class="fa fa-refresh fa-spin"></i>
+            </div>
             <div class="box-footer">
                 <button type="submit" class="btn btn-primary pull-right">Save</button>
             </div>
@@ -93,14 +86,46 @@
 <script>
 
   import Form from 'acacha-forms'
+  import { wait, checkImage } from '../utils'
+
+  const STATUS_INITIAL = 0, STATUS_LOADING = 1;
 
   export default {
     data: function () {
       return {
+        currentStatus: STATUS_INITIAL,
+        person: null,
         form: new Form({ givenName: '', surname1: '', surname2: '', birthdate: '', birthplace_id: '', gender: '' })
       }
     },
+    computed: {
+      isInitial() {
+        return this.currentStatus === STATUS_INITIAL
+      },
+      isLoading() {
+        return this.currentStatus === STATUS_LOADING
+      },
+    },
     methods: {
+      fullNameSelected(fullname) {
+        this.fetchPerson(fullname.id)
+      },
+      IdentifierSelected(identifier){
+        this.fetchPerson(identifier.person_id)
+      },
+      fetchPerson(personId) {
+        this.currentStatus = STATUS_LOADING
+        let url = '/api/v1/person/' + personId
+        axios.get(url).then(wait(1000)).then( response => {
+          console.log(response)
+          this.person = response.data
+          //TODO update fullname and NIF
+        }).catch( error  => {
+          console.log(error)
+        }).then(() => {
+          this.currentStatus = STATUS_INITIAL
+        })
+      },
       submit () {
         const API_URL = 'http://localhost:3000/users'
         this.form.post(API_URL)

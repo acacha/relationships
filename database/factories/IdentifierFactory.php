@@ -1,7 +1,6 @@
 <?php
 
 use Acacha\Relationships\Models\Identifier;
-use Acacha\Relationships\Models\IdentifierType;
 use Faker\Factory;
 use Faker\Generator as Faker;
 

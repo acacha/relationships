@@ -9,6 +9,8 @@ use Acacha\Relationships\Models\Location;
 use Acacha\Relationships\Models\Person;
 use Acacha\Relationships\Models\Photo;
 use App\User;
+use Carbon\Carbon;
+use Faker\Factory;
 use Illuminate\Http\UploadedFile;
 use Spatie\Permission\PermissionRegistrar;
 
@@ -83,6 +85,14 @@ if (! function_exists('initialize_relationships_management_permissions')) {
         //Search identifiers
         permission_first_or_create('search-identifiers');
         give_permission_to_role($manageRelationships,'search-identifiers');
+
+        //Fullnames
+        permission_first_or_create('list-fullnames');
+        give_permission_to_role($manageRelationships,'list-fullnames');
+
+        //Person
+        permission_first_or_create('show-person');
+        give_permission_to_role($manageRelationships,'show-person');
 
         app(PermissionRegistrar::class)->registerPermissions();
 
@@ -671,6 +681,22 @@ if (! function_exists('remove_photo_to_user')) {
     }
 }
 
+if (! function_exists('create_person_with_nif')) {
+    /**
+     *Create person with NIF
+     */
+    function create_person_with_nif()
+    {
+        $faker = Factory::create('es_ES');
+
+        $person = factory(Person::class)->states('ca')->create();
+        $idType = IdentifierType::firstOrCreate(['name' => 'NIF']);
+        $id = Identifier::create(['value' => $faker->dni,'type_id' => $idType->id]);
+        $person->identifiers()->attach($id->id);
+
+        return $person;
+    }
+}
 
 if (! function_exists('seed_relationships')) {
     function seed_relationships()

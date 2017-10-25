@@ -2,18 +2,18 @@
 
 namespace Acacha\Relationships\Http\Requests;
 
-use Acacha\Relationships\Http\Requests\Traits\PersonOwns;
+use Acacha\Relationships\Http\Requests\Traits\UserPersonOwns;
 use Auth;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * Class ShowPersonPhoto.
+ * Class ShowPerson.
  *
  * @package Acacha\Relationships\Http\Requests
  */
-class ShowPersonPhoto extends FormRequest
+class ShowPerson extends FormRequest
 {
-    use PersonOwns;
+    use UserPersonOwns;
 
     /**
      * Determine if the user is authorized to make this request.
@@ -22,8 +22,8 @@ class ShowPersonPhoto extends FormRequest
      */
     public function authorize()
     {
-        if (Auth::user()->can('show-person-photo')) return true;
-        if ($this->personOwns()) return true;
+        if (Auth::user()->can('show-person')) return true;
+        if ($this->UserPersonOwns()) return true;
         return false;
     }
 

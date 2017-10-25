@@ -28,7 +28,6 @@ Route::group(['middleware' => 'api','prefix' => 'api/v1', 'middleware' => ['thro
         Route::delete('/photos/{photo}',        'PhotoController@delete');
         Route::post('/photos/{photo}',          'PhotoController@post');
 
-
         //IdentifierTypes
         Route::get('/identifierType',           'IdentifierTypeController@index');
 
@@ -36,7 +35,13 @@ Route::group(['middleware' => 'api','prefix' => 'api/v1', 'middleware' => ['thro
         Route::get('/identifier/search',        'IdentifierSearchController@index');
 
         //Identifiers
-        Route::get('/identifier',        'IdentifierController@index');
+        Route::get('/identifier',               'IdentifierController@index');
+
+        //Fullnames
+        Route::get('/fullname',                 'FullNameController@index');
+
+        //Persons
+        Route::get('/person/{person}',          'PersonController@show');
 
     });
 

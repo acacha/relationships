@@ -2,19 +2,16 @@
 
 namespace Acacha\Relationships\Http\Requests;
 
-use Acacha\Relationships\Http\Requests\Traits\PersonOwns;
 use Auth;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * Class ShowPersonPhoto.
+ * Class ListFullnames.
  *
  * @package Acacha\Relationships\Http\Requests
  */
-class ShowPersonPhoto extends FormRequest
+class ListFullnames extends FormRequest
 {
-    use PersonOwns;
-
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -22,8 +19,7 @@ class ShowPersonPhoto extends FormRequest
      */
     public function authorize()
     {
-        if (Auth::user()->can('show-person-photo')) return true;
-        if ($this->personOwns()) return true;
+        if (Auth::user()->can('list-fullnames')) return true;
         return false;
     }
 
@@ -35,7 +31,7 @@ class ShowPersonPhoto extends FormRequest
     public function rules()
     {
         return [
-            //
+
         ];
     }
 }

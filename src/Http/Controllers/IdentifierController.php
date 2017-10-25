@@ -12,7 +12,6 @@ use Acacha\Relationships\Models\Identifier;
  */
 class IdentifierController extends Controller
 {
-
     /**
      * Show all identifiers.
      *
@@ -20,6 +19,22 @@ class IdentifierController extends Controller
      */
     public function index(ListIdentifiers $request)
     {
-        return Identifier::all();
+
+        $identifiers = [];
+        foreach (Identifier::has('persons')->with(array('persons'=>function($query){
+            $query->select('people.id');
+        }))->get() as $identifier) {
+
+            $identifiers[] = [
+                'id' => $identifier->id,
+                'value' => $identifier->value,
+                'type_id' => $identifier->type_id,
+                'type_name' => $identifier->type_name,
+                'person_id' => $identifier->persons()->first()->pivot->person_id
+            ];
+        }
+
+        return $identifiers;
+
     }
 }

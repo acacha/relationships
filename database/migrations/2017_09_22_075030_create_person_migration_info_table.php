@@ -20,6 +20,7 @@ class CreatePersonMigrationInfoTable extends Migration
             $table->increments('id');
             $table->integer('person_id')->unsigned();
             $table->integer('original_person_id')->unsigned();
+            $table->string('original_person_fullname');
 
             $table->foreign('person_id')->references('id')->on('people')->onDelete('cascade');
 

@@ -29,6 +29,9 @@
 </template>
 
 <script>
+
+//  IMPORTANT:  CODE NOT COMPLETED PLEASE DO NOT USE
+
   import Form from 'acacha-forms'
   import VueTypeahead from 'vue-typeahead'
 
@@ -67,7 +70,6 @@
       }
     },
     mounted() {
-      console.log('Component identifier input mounted.')
       this.fetchIdentifierTypes()
       this.$http = axios
     }
