@@ -14,7 +14,8 @@
             <multiselect id="identifier" v-model="value" :options="identifiers" label="value" :custom-label="customLabel"
                          :taggable="true" @tag="addIdentifier" @select="identifierHasBeenSelected"
                          placeholder="Select identifier"
-                         tag-placeholder="Add this as new identifier"></multiselect>
+                         tag-placeholder="Add this as new identifier"
+                         :disabled="disabled"></multiselect>
         </div>
     </div>
 </template>
@@ -41,9 +42,44 @@
       selected: {
         type: String,
         required: false
+      },
+      disabled: {
+        type: Boolean,
+        default: false
+      },
+      identifier: {
+        default: null
+      },
+      type: {
+        default: null
+      }
+    },
+    watch: {
+      identifier: function(newVal, oldVal) {
+        this.updateIdentifier(newVal)
+      },
+      type: function(newVal,oldVal) {
+        this.updateIdentifierType(newVal)
       }
     },
     methods: {
+      updateIdentifier(id) {
+        this.value = this.findIdentifierById(id)
+        this.updateIdentifierType(this.value.type_id)
+      },
+      findIdentifierById(id){
+        return this.identifiers.find((identifierType) => {
+          return identifierType.id === id
+        })
+      },
+      updateIdentifierType(id) {
+        this.identifierType = this.findIdentifierType(id)
+      },
+      findIdentifierType(id) {
+        return this.identifierTypes.find((identifierType) => {
+          return identifierType.id === id
+        })
+      },
       identifierHasBeenSelected(identifier) {
         this.identifierType = identifier.type
         this.$emit('selected',identifier)
@@ -68,15 +104,15 @@
           this.value.type = identifierType
           this.value.type_id = identifierType.id
           this.value.type_name = identifierType.name
+
+          let id = this.identifiers.find((identifier) => {
+            return identifier.id === this.value.id
+          })
+
+          id.type = identifierType
+          id.type_id = identifierType.id
+          id.type_name = identifierType.name
         }
-        let id = this.identifiers.find((identifier) => {
-          return identifier.id === this.value.id
-        })
-
-        id.type = identifierType
-        id.type_id = identifierType.id
-        id.type_name = identifierType.name
-
       },
       fetchIdentifiers() {
         let url = '/api/v1/identifier'

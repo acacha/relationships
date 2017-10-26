@@ -24,6 +24,7 @@ class FullNameController  extends Controller
             $fullnames[] = [
               'name' => $person->name,
               'identifier' => $person->identifier,
+              'identifier_id' => $person->identifier_id,
               'id' => $person->id
             ];
         }

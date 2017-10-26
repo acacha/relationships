@@ -4,7 +4,7 @@
         <label for="fullname">Full name</label>
         <multiselect id="fullname" v-model="fullname" :options="fullnames" label="fullname" :custom-label="customLabel"
                      @select="fullnameHasBeenSelected"
-                     placeholder="Select name"></multiselect>
+                     placeholder="Select name" :disabled="disabled"></multiselect>
     </div>
 </template>
 
@@ -19,7 +19,29 @@
         fullnames: []
       }
     },
+    props: {
+      disabled: {
+        type: Boolean,
+        default: false
+      },
+      identifier: {
+        default: null
+      }
+    },
+    watch: {
+      identifier: function(newVal, oldVal) {
+        this.updateSelectedFullname(newVal)
+      }
+    },
     methods: {
+      updateSelectedFullname(id) {
+        this.fullname = this.findFullNameByIdentifierId(id)
+      },
+      findFullNameByIdentifierId(id){
+        return this.fullnames.find((fullname) => {
+          return fullname.identifier_id === id
+        })
+      },
       fullnameHasBeenSelected(fullname) {
         this.$emit('selected',fullname)
       },

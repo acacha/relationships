@@ -47,7 +47,7 @@ class Person extends Model implements Stateful
      *
      * @var array
      */
-    protected $appends = ['identifier','birthplace-name'];
+    protected $appends = ['identifier','identifier-id','identifier-type','birthplace-name'];
 
     /**
      * Transaction States
@@ -94,6 +94,26 @@ class Person extends Model implements Stateful
     public function getIdentifierAttribute()
     {
         return $this->identifiers->first() ? $this->identifiers->first()->value : '';
+    }
+
+    /**
+     * Get the persons's identifier.
+     *
+     * @return string
+     */
+    public function getIdentifierTypeAttribute()
+    {
+        return $this->identifiers->first() ? $this->identifiers->first()->type_id : '';
+    }
+
+    /**
+     * Get the persons's identifier.
+     *
+     * @return string
+     */
+    public function getIdentifierIdAttribute()
+    {
+        return $this->identifiers->first() ? $this->identifiers->first()->id : '';
     }
 
     /**

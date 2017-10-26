@@ -19,8 +19,8 @@ class IdentifierController extends Controller
      */
     public function index(ListIdentifiers $request)
     {
-
         $identifiers = [];
+        // NOTE: avoid retrieving all persons relationship to avoid crossed relations loop!
         foreach (Identifier::has('persons')->with(array('persons'=>function($query){
             $query->select('people.id');
         }))->get() as $identifier) {
