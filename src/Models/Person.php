@@ -35,6 +35,8 @@ class Person extends Model implements Stateful
         'state'
     ];
 
+    protected $dates = ['birthdate','created_at','updated_at'];
+
     /**
      * The relationships to eager load.
      *

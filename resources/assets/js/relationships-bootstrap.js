@@ -6,3 +6,10 @@ Vue.component('identifier-input', require('./personal-data/IdentifierInputCompon
 Vue.component('identifier-select', require('./personal-data/IdentifierSelectComponent.vue'));
 Vue.component('fullname-select', require('./personal-data/FullnameSelectComponent.vue'));
 
+Vue.component('adminlte-input-date-mask', require('./personal-data/AdminlteInputDateMask.vue'));
+Vue.component('adminlte-input-gender', require('./personal-data/AdminlteInputGender.vue'));
+
+import { config } from './config/relationships'
+
+window.acacha_relationships = {}
+window.acacha_relationships.config = config

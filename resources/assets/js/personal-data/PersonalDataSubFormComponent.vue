@@ -38,7 +38,7 @@
                                 <span class="help-block" v-if="form.errors.has('surname1')" v-text="form.errors.get('surname1')"></span>
                             </transition>
                             <input type="text" class="form-control" id="surname1" placeholder="Surname 1" name="surname1"
-                                   v-model="form.givenName" :disabled="isLoading">
+                                   v-model="form.surname1" :disabled="isLoading">
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -51,19 +51,23 @@
                                    v-model="form.surname2" :disabled="isLoading">
                         </div>
                     </div>
+                    <div class="col-md-2">
+                        <adminlte-input-gender
+                                :disabled="isLoading"
+                                :gender="form.gender ? form.gender : 'male'"
+                                @change="genderHasBeenChanged"></adminlte-input-gender>
+                    </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-2">
-                        <div class="form-group has-feedback" :class="{ 'has-error': form.errors.has('birthdate') }">
-                            <label for="Birth date">Birth date</label>
-                            <transition name="fade">
-                                <span class="help-block" v-if="form.errors.has('birthdate')" v-text="form.errors.get('birthdate')"></span>
-                            </transition>
-                            <input type="text" class="form-control" id="Birth date" placeholder="Birth date" name="birthdate"
-                                   v-model="form.birthdate" :disabled="isLoading">
-                        </div>
+
+                    <div class="col-md-4">
+                        <adminlte-input-date-mask id="birthdate" :disabled="isLoading"
+                                                  :date="form.birthdate" @change="birthDateHasBeenChanged">
+                            <template slot="label">Birth date</template>
+                        </adminlte-input-date-mask>
                     </div>
-                    <div class="col-md-3">
+
+                    <div class="col-md-4">
                         <div class="form-group has-feedback" :class="{ 'has-error': form.errors.has('birthplace_id') }">
                             <label for="Birthplace">Birth Place</label>
                             <transition name="fade">
@@ -73,16 +77,7 @@
                                    v-model="form.birthplace_id" :disabled="isLoading">
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="form-group has-feedback" :class="{ 'has-error': form.errors.has('gender') }">
-                            <label for="gender">Gender</label>
-                            <transition name="fade">
-                                <span class="help-block" v-if="form.errors.has('gender')" v-text="form.errors.get('gender')"></span>
-                            </transition>
-                            <input type="text" class="form-control" id="gender" placeholder="Gender" name="gender"
-                                   v-model="form.gender" :disabled="isLoading">
-                        </div>
-                    </div>
+
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="todo">Altres accions</label>
@@ -90,7 +85,14 @@
                         </div>
                     </div>
 
-
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h1>Form:</h1>
+                        {{ form }}
+                        <h1>Birthdate:</h1>
+                        {{ form.birthdate }}
+                    </div>
                 </div>
             </div>
             <div class="overlay" v-show="isLoading">
@@ -110,7 +112,7 @@
 <script>
 
   import Form from 'acacha-forms'
-  import { wait, checkImage } from '../utils'
+  import { wait, LaravelDate } from '../utils'
 
   const STATUS_INITIAL = 0, STATUS_LOADING = 1, STATUS_UPDATING_EXISTING_PERSON = 2;
 
@@ -134,6 +136,12 @@
       },
     },
     methods: {
+      birthDateHasBeenChanged(newDate) {
+        this.form.birthdate = newDate
+      },
+      genderHasBeenChanged(newGender) {
+        this.form.gender = newGender.value
+      },
       fullNameSelected(fullname) {
         this.fetchPerson(fullname.id)
       },
@@ -173,7 +181,7 @@
       }
     },
     mounted() {
-      console.log('Component personal data subform mounted.')
+      console.log('Personal data subform mounted')
     }
   }
 </script>
