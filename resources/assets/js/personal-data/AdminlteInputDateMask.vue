@@ -1,7 +1,7 @@
 <!-- Vue component -->
 <template>
     <div class="input-group has-feedback" :class="{ 'has-error': hasError }">
-        <slot for="this.id" name="label">Date</slot>
+        <slot :for="this.id" name="label">Date</slot>
         <transition name="fade">
             <span class="help-block" v-if="hasError" v-text="error"></span>
         </transition>

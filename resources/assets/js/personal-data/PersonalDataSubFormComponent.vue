@@ -14,10 +14,10 @@
             <div class="box-body">
                 <div class="row">
                     <div class="col-md-5">
-                        <identifier-select @selected="IdentifierSelected" :disabled="isLoading" :type="this.identifier_type" :identifier="form.identifier_id"></identifier-select>
+                        <identifier-select @tag="identifierAdded" @selected="identifierSelected" :disabled="isLoading" :type="this.identifier_type" :identifier="form.identifier_id"></identifier-select>
                     </div>
                     <div class="col-md-7">
-                        <fullname-select @selected="fullNameSelected" :disabled="isLoading" :identifier="form.identifier_id"></fullname-select>
+                        <fullname-select @selected="fullNameSelected" :disabled="isLoading" :identifier="form.identifier_id" :fullname="fullname"></fullname-select>
                     </div>
                 </div>
                 <div class="row">
@@ -28,7 +28,7 @@
                                 <span class="help-block" v-if="form.errors.has('givenName')" v-text="form.errors.get('givenName')"></span>
                             </transition>
                             <input type="text" class="form-control" id="givenName" placeholder="Name" name="givenName"
-                                   v-model="form.givenName" :disabled="isLoading">
+                                   v-model="form.givenName" :disabled="isLoading" @change="updateFullName">
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -38,7 +38,7 @@
                                 <span class="help-block" v-if="form.errors.has('surname1')" v-text="form.errors.get('surname1')"></span>
                             </transition>
                             <input type="text" class="form-control" id="surname1" placeholder="Surname 1" name="surname1"
-                                   v-model="form.surname1" :disabled="isLoading">
+                                   v-model="form.surname1" :disabled="isLoading" @change="updateFullName">
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -48,7 +48,7 @@
                                 <span class="help-block" v-if="form.errors.has('surname2')" v-text="form.errors.get('surname2')"></span>
                             </transition>
                             <input type="text" class="form-control" id="surname2" placeholder="Surname 2" name="surname2"
-                                   v-model="form.surname2" :disabled="isLoading">
+                                   v-model="form.surname2" :disabled="isLoading" @change="updateFullName">
                         </div>
                     </div>
                     <div class="col-md-2">
@@ -68,14 +68,12 @@
                     </div>
 
                     <div class="col-md-4">
-                        <div class="form-group has-feedback" :class="{ 'has-error': form.errors.has('birthplace_id') }">
-                            <label for="Birthplace">Birth Place</label>
-                            <transition name="fade">
-                                <span class="help-block" v-if="form.errors.has('birthplace_id')" v-text="form.errors.get('birthplace_id')"></span>
-                            </transition>
-                            <input type="text" class="form-control" id="Birthplace" placeholder="Birth place" name="birthplace_id"
-                                   v-model="form.birthplace_id" :disabled="isLoading">
-                        </div>
+                        <adminlte-input-location id="birthplace_id" :disabled="isLoading"
+                                                 :location="form.birthplace_id ? form.birthplace_id : 1"
+                                                 @change="birthPlaceHasBeenChanged"
+                                                 name="birthplace_id">
+                            <template slot="label">Birth place</template>
+                        </adminlte-input-location>
                     </div>
 
                     <div class="col-md-4">
@@ -121,6 +119,9 @@
       return {
         currentStatus: STATUS_INITIAL,
         identifier_type: null,
+        identifier: null,
+        fullname : null,
+        personId : null,
         form: new Form({ identifier_id: '',givenName: '', surname1: '', surname2: '', birthdate: '', birthplace_id: '', gender: '' }),
       }
     },
@@ -136,8 +137,17 @@
       },
     },
     methods: {
+      updateFullName() {
+        this.fullname = {
+          name: this.form.givenName + ' ' + this.form.surname1 + ' ' + this.form.surname2,
+          identifier: this.identifier.value
+        }
+      },
       birthDateHasBeenChanged(newDate) {
         this.form.birthdate = newDate
+      },
+      birthPlaceHasBeenChanged(newBirthPlace) {
+        this.form.birthplace_id = newBirthPlace.id
       },
       genderHasBeenChanged(newGender) {
         this.form.gender = newGender.value
@@ -145,8 +155,12 @@
       fullNameSelected(fullname) {
         this.fetchPerson(fullname.id)
       },
-      IdentifierSelected(identifier){
+      identifierSelected(identifier){
         this.fetchPerson(identifier.person_id)
+      },
+      identifierAdded(identifier) {
+        this.identifier = identifier
+        this.updateFullName()
       },
       mapPersonToForm(person) {
         this.form.identifier_id= person['identifier-id']
@@ -161,15 +175,29 @@
       fetchPerson(personId, selectType) {
         this.currentStatus = STATUS_LOADING
         let url = '/api/v1/person/' + personId
-        axios.get(url).then(wait(1000)).then( response => {
+        axios.get(url).then( response => {
           this.mapPersonToForm(response.data)
           this.currentStatus = STATUS_UPDATING_EXISTING_PERSON
+        }).catch( (error) => {
+          console.log(error)
+        }).then( () => {
+          this.personId = personId
         })
       },
+      apiURL() {
+        if (this.isUpdatingExistingPerson) return '/ap1/v1/person/' + this.personId
+        return '/api/v1/person'
+      },
+      getMethod() {
+        if (this.isUpdatingExistingPerson) return 'put'
+        return 'post'
+      },
       submit () {
-        const API_URL = 'http://localhost:3000/users'
-        this.form.post(API_URL)
+        let API_URL = this.apiURL()
+        let method = this.getMethod()
+        this.form[method](API_URL)
           .then(response => {
+            console.log(response.data)
             console.log('Ok!')
           })
           .catch(error => {
@@ -179,9 +207,6 @@
       clearErrors (name) {
         this.form.errors.clear(name)
       }
-    },
-    mounted() {
-      console.log('Personal data subform mounted')
     }
   }
 </script>

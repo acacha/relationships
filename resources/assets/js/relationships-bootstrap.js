@@ -8,6 +8,7 @@ Vue.component('fullname-select', require('./personal-data/FullnameSelectComponen
 
 Vue.component('adminlte-input-date-mask', require('./personal-data/AdminlteInputDateMask.vue'));
 Vue.component('adminlte-input-gender', require('./personal-data/AdminlteInputGender.vue'));
+Vue.component('adminlte-input-location', require('./personal-data/AdminlteInputLocation.vue'));
 
 import { config } from './config/relationships'
 

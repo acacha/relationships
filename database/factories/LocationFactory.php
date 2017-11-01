@@ -6,9 +6,9 @@ use Faker\Factory;
 use Faker\Generator as Faker;
 
 $factory->define(Location::class, function (Faker $faker) {
-    $faker->addProvider(new \Acacha\Relationships\Faker\Providers\CatalanLocation($faker));
+    $faker->addProvider(new \Acacha\Relationships\Faker\Providers\CatalanTerresEbreLocation($faker));
 
-    $location = $faker->unique()->location;
+    $location = $faker->location;
 
     return [
         'name' => $location['name'],

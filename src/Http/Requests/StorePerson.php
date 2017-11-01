@@ -2,18 +2,16 @@
 
 namespace Acacha\Relationships\Http\Requests;
 
-use Acacha\Relationships\Http\Requests\Traits\UserPersonOwns;
 use Auth;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * Class ShowPerson.
+ * Class StorePerson.
  *
  * @package Acacha\Relationships\Http\Requests
  */
-class ShowPerson extends FormRequest
+class StorePerson extends FormRequest
 {
-    use UserPersonOwns;
 
     /**
      * Determine if the user is authorized to make this request.
@@ -22,8 +20,7 @@ class ShowPerson extends FormRequest
      */
     public function authorize()
     {
-        if (Auth::user()->can('show-person')) return true;
-        if ($this->userPersonOwns()) return true;
+        if (Auth::user()->can('store-person')) return true;
         return false;
     }
 

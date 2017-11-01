@@ -13,6 +13,12 @@ Route::group(['middleware' => 'web'], function () {
 
 Route::group(['middleware' => 'api','prefix' => 'api/v1', 'middleware' => ['throttle','bindings']], function () {
     Route::group(['middleware' => 'auth:api'], function() {
+
+        //Persons
+        Route::get('/person/{person}',          'PersonController@show');
+        Route::post('/person',                  'PersonController@store');
+
+        //Person photos
         Route::get('/person/{id}/photos',       'PersonPhotoController@index');
         Route::get('/person/{id}/photo',        'PersonPhotoController@show');
         Route::post('/person/{id}/photo',       'PersonPhotoController@store');
@@ -40,8 +46,9 @@ Route::group(['middleware' => 'api','prefix' => 'api/v1', 'middleware' => ['thro
         //Fullnames
         Route::get('/fullname',                 'FullNameController@index');
 
-        //Persons
-        Route::get('/person/{person}',          'PersonController@show');
+        //Locations
+        Route::get('/location',                 'LocationController@index');
+
 
     });
 

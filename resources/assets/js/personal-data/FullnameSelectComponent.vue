@@ -2,9 +2,9 @@
 <template>
     <div class="form-group">
         <label for="fullname">Full name</label>
-        <multiselect id="fullname" v-model="fullname" :options="fullnames" label="fullname" :custom-label="customLabel"
+        <multiselect id="fullname" v-model="internalFullname" :options="fullnames" :custom-label="customLabel"
                      @select="fullnameHasBeenSelected"
-                     placeholder="Select name" :disabled="disabled"></multiselect>
+                     placeholder="Select name" :disabled="disabled" :loading="loading"></multiselect>
     </div>
 </template>
 
@@ -15,8 +15,9 @@
     components: { Multiselect },
     data () {
       return {
-        fullname: null,
-        fullnames: []
+        internalFullname: null,
+        fullnames: [],
+        loading: false
       }
     },
     props: {
@@ -26,16 +27,28 @@
       },
       identifier: {
         default: null
+      },
+      fullname: {
+        type: Object,
+        default: null
       }
     },
     watch: {
-      identifier: function(newVal, oldVal) {
-        this.updateSelectedFullname(newVal)
+      identifier: function(newVal) {
+        this.updateSelectedFullnameByIdentifier(newVal)
+      },
+      fullname: function(newVal) {
+        if (this.fullnames[newVal]) this.internalFullname = newVal
+        this.addNewFullNameAndSelect(newVal)
       }
     },
     methods: {
-      updateSelectedFullname(id) {
-        this.fullname = this.findFullNameByIdentifierId(id)
+      updateSelectedFullnameByIdentifier(id) {
+        this.internalFullname = this.findFullNameByIdentifierId(id)
+      },
+      addNewFullNameAndSelect(fullname) {
+        this.fullnames.push(fullname)
+        this.internalFullname = fullname
       },
       findFullNameByIdentifierId(id){
         return this.fullnames.find((fullname) => {
@@ -50,10 +63,13 @@
       },
       fetchFullnames() {
         let url = '/api/v1/fullname'
+        this.loading = true
         axios.get(url).then((response) => {
           this.fullnames = response.data
         }).catch((error) => {
           console.log(error)
+        }).then( () => {
+          this.loading = false
         })
       },
     },

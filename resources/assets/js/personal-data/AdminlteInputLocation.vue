@@ -1,14 +1,14 @@
 <!-- Vue component -->
 <template>
     <div class="form-group has-feedback" :class="{ 'has-error': hasError }">
-        <slot :for="this.id" name="label">Gender</slot>
+        <slot :for="this.id" name="label">Location</slot>
         <transition name="fade">
             <span class="help-block" v-if="hasError" v-text="error"></span>
         </transition>
-        <multiselect :id="this.id" :name="this.name" v-model="internalGender" :options="genders" label="internalGender"
-                     @select="genderHasBeenSelected" select-label=""
-                     placeholder="Select gender" :custom-label="customLabel"
-                     :disabled="disabled"></multiselect>
+        <multiselect :id="this.id" :name="this.name" v-model="internalLocation" :options="locations"
+                     @select="locationHasBeenSelected" select-label=""
+                     placeholder="Select location" :custom-label="customLabel"
+                     :disabled="disabled" :loading="loading"></multiselect>
     </div>
 </template>
 
@@ -16,6 +16,7 @@
 
   import moment from 'moment';
   import Multiselect from 'vue-multiselect'
+  import { wait } from '../utils.js'
 
   export default {
     components: { Multiselect },
@@ -23,17 +24,9 @@
       return {
         hasError: false,
         error: '',
-        genders: [
-          {
-            label : 'Male',
-            value: 'male'
-          },
-          {
-            label : 'Female',
-            value: 'female'
-          }
-        ],
-        internalGender: null
+        loading: false,
+        locations: [],
+        internalLocation: null
       }
     },
     props: {
@@ -41,42 +34,54 @@
         type: Boolean,
         default: false
       },
-      gender: {
-        type: String,
+      location: {
+        type: Number,
         required: false
       },
       id: {
         type: String,
-        default: 'gender'
+        default: 'location'
       },
       name: {
         type: String,
-        default: 'gender'
+        default: 'location'
       }
     },
     watch: {
-      gender: function(newVal, oldVal) {
-        this.updateGender(newVal)
+      location: function(newVal) {
+        this.updateLocation(newVal)
       },
     },
     methods: {
-      updateGender(gender) {
-        this.internalGender = this.findGenderByValue(gender)
+      updateLocation(location) {
+        this.internalLocation = this.findLocationById(location)
       },
-      findGenderByValue(genderValue){
-        return this.genders.find((gender) => {
-          return gender.value === genderValue
+      findLocationById(locationId){
+        return this.locations.find((location) => {
+          return location.id === locationId
         })
       },
-      customLabel({ label }) {
-        return `${label}`
+      customLabel({ name }) {
+        return `${name}`
       },
-      genderHasBeenSelected(gender) {
-        this.$emit('change', gender)
+      locationHasBeenSelected(location) {
+        this.$emit('change', location)
+      },
+      fetchLocations() {
+        const url = '/api/v1/location'
+        this.loading = true
+        axios.get(url).then(wait(1000)).then( (response) => {
+          this.locations = response.data
+        }).catch( (error) => {
+          console.log(error)
+        }).then( () => {
+          this.loading = false
+        })
       }
     },
     mounted() {
-      this.internalGender = this.findGenderByValue(this.gender)
+      this.fetchLocations()
+      this.internalLocation = this.findLocationById(this.location)
     }
   }
 

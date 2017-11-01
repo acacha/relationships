@@ -15,7 +15,7 @@ trait UserPersonOwns
      * @param null $id
      * @return bool
      */
-    protected function UserPersonOwns($id = null)
+    protected function userPersonOwns($id = null)
     {
         $id ?: $id = $this->person->id;
         if (Auth::user()->person) {

@@ -15,7 +15,7 @@
                          :taggable="true" @tag="addIdentifier" @select="identifierHasBeenSelected"
                          placeholder="Select identifier"
                          tag-placeholder="Add this as new identifier"
-                         :disabled="disabled"></multiselect>
+                         :disabled="disabled" :loading="loading"></multiselect>
         </div>
     </div>
 </template>
@@ -28,6 +28,7 @@
     data () {
       return {
         value: null,
+        loading: false,
         identifiers: [],
         identifierType : null,
         identifierTypes: []
@@ -89,13 +90,14 @@
       },
       fetchIdentifierTypes() {
         let url = '/api/v1/identifierType'
+        this.loading = true
         axios.get(url).then((response) => {
           this.identifierTypes = response.data
           this.setDefaultSelectedIdentifierType()
         }).catch((error) => {
           console.log(error)
         }).then(() => {
-
+          this.loading = false
         })
       },
       selectIdentifierType(identifierType) {
@@ -131,6 +133,7 @@
         }
         this.identifiers.push(identifier)
         this.value = identifier
+        this.$emit('tag', identifier)
       },
       setDefaultSelectedIdentifierType() {
         if ( this.selected ) {

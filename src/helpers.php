@@ -92,7 +92,13 @@ if (! function_exists('initialize_relationships_management_permissions')) {
 
         //Person
         permission_first_or_create('show-person');
+        permission_first_or_create('store-person');
         give_permission_to_role($manageRelationships,'show-person');
+        give_permission_to_role($manageRelationships,'store-person');
+
+        //Locations
+        permission_first_or_create('list-locations');
+        give_permission_to_role($manageRelationships,'list-locations');
 
         app(PermissionRegistrar::class)->registerPermissions();
 
@@ -681,17 +687,35 @@ if (! function_exists('remove_photo_to_user')) {
     }
 }
 
+if (! function_exists('create_nif_identifier')) {
+    /**
+     *Create NIF identifier.
+     */
+    function create_nif_identifier()
+    {
+        $faker = Factory::create('es_ES');
+
+        $type = IdentifierType::firstOrCreate([
+            'name' => 'NIF'
+        ]);
+
+        $identifier = Identifier::create([
+            'value' => $faker->dni,
+            'type_id' => $type->id
+        ]);
+
+        return $identifier;
+    }
+}
+
 if (! function_exists('create_person_with_nif')) {
     /**
      *Create person with NIF
      */
     function create_person_with_nif()
     {
-        $faker = Factory::create('es_ES');
-
         $person = factory(Person::class)->states('ca')->create();
-        $idType = IdentifierType::firstOrCreate(['name' => 'NIF']);
-        $id = Identifier::create(['value' => $faker->dni,'type_id' => $idType->id]);
+        $id = create_nif_identifier();
         $person->identifiers()->attach($id->id);
 
         return $person;
