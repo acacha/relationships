@@ -11,7 +11,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CanSignInAsRelationshipsManager;
 use Tests\Traits\CheckJsonAPIUriAuthorization;
 
-
 /**
  * Class IdentifierTest.
  *

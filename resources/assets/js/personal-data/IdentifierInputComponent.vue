@@ -34,6 +34,7 @@
 
   import Form from 'acacha-forms'
   import VueTypeahead from 'vue-typeahead'
+  import axios from 'axios'
 
   export default {
     extends: VueTypeahead,
