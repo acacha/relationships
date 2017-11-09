@@ -23,7 +23,7 @@ class FullNameController  extends Controller
         foreach (Person::finished()->get() as $person) {
             $fullnames[] = [
               'name' => $person->name,
-              'identifier' => $person->identifier,
+              'identifier' => $person->identifier->value,
               'identifier_id' => $person->identifier_id,
               'id' => $person->id
             ];

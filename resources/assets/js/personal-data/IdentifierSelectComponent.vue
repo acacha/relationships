@@ -1,7 +1,12 @@
 <!-- Vue component -->
 <template>
-    <div class="form-group">
-        <label for="identifier">Identifier</label>
+    <div class="form-group has-feedback" :class="{ 'has-error': hasError }">
+        <transition name="fade">
+            <label class="help-block" v-if="hasError" v-text="error"></label>
+            <slot name="label" v-else>
+                <label :for="this.id">Identifier</label>
+            </slot>
+        </transition>
         <div class="input-group">
             <div class="input-group-btn">
                 <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
@@ -11,13 +16,14 @@
                     <li v-for="identifierType in identifierTypes" @click="selectIdentifierType(identifierType)"><a href="#">{{ identifierType.name }}</a></li>
                 </ul>
             </div>
-            <multiselect id="identifier" v-model="value" :options="identifiers" label="value" :custom-label="customLabel"
+            <multiselect id="identifier" v-model="internalIdentifier" :options="identifiers" :custom-label="customLabel"
                          :taggable="true" @tag="addIdentifier" @select="identifierHasBeenSelected"
                          placeholder="Select identifier"
                          tag-placeholder="Add this as new identifier"
                          :disabled="disabled" :loading="loading"></multiselect>
         </div>
     </div>
+
 </template>
 
 <script>
@@ -27,7 +33,7 @@
     components: { Multiselect },
     data () {
       return {
-        value: null,
+        internalIdentifier: null,
         loading: false,
         identifiers: [],
         identifierType : null,
@@ -35,8 +41,11 @@
       }
     },
     computed: {
-      identifierTypeName: function () {
+      identifierTypeName() {
         return this.identifierType ? this.identifierType.name : ''
+      },
+      hasError() {
+        return this.error ? true : false
       }
     },
     props: {
@@ -53,25 +62,28 @@
       },
       type: {
         default: null
+      },
+      error: {
+        default: null
       }
     },
     watch: {
       identifier: function(newVal, oldVal) {
+        console.log('watcher for identifier')
         this.updateIdentifier(newVal)
       },
       type: function(newVal,oldVal) {
+        console.log('watcher for type')
         this.updateIdentifierType(newVal)
       }
     },
     methods: {
-      updateIdentifier(id) {
-        this.value = this.findIdentifierById(id)
-        this.updateIdentifierType(this.value.type_id)
-      },
-      findIdentifierById(id){
-        return this.identifiers.find((identifierType) => {
-          return identifierType.id === id
-        })
+      updateIdentifier(identifier) {
+        console.log('updateIdentifier')
+        console.log('indentifier:')
+        console.log(identifier)
+        this.internalIdentifier = this.identifiers[identifier]
+        if (this.internalIdentifier) this.updateIdentifierType(this.internalIdentifier.type_id)
       },
       updateIdentifierType(id) {
         this.identifierType = this.findIdentifierType(id)
@@ -82,7 +94,7 @@
         })
       },
       identifierHasBeenSelected(identifier) {
-        this.identifierType = identifier.type
+        this.updateIdentifierType(identifier.type_id)
         this.$emit('selected',identifier)
       },
       customLabel({ value, type_name}) {
@@ -102,13 +114,13 @@
       },
       selectIdentifierType(identifierType) {
         this.identifierType = identifierType
-        if (this.value) {
-          this.value.type = identifierType
-          this.value.type_id = identifierType.id
-          this.value.type_name = identifierType.name
+        if (this.internalIdentifier) {
+          this.internalIdentifier.type = identifierType
+          this.internalIdentifier.type_id = identifierType.id
+          this.internalIdentifier.type_name = identifierType.name
 
           let id = this.identifiers.find((identifier) => {
-            return identifier.id === this.value.id
+            return identifier.id === this.internalIdentifier.id
           })
 
           id.type = identifierType
@@ -132,7 +144,7 @@
           type_name: this.identifierType.name
         }
         this.identifiers.push(identifier)
-        this.value = identifier
+        this.internalIdentifier = identifier
         this.$emit('tag', identifier)
       },
       setDefaultSelectedIdentifierType() {

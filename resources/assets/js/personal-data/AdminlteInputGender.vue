@@ -1,7 +1,9 @@
 <!-- Vue component -->
 <template>
     <div class="form-group has-feedback" :class="{ 'has-error': hasError }">
-        <slot :for="this.id" name="label">Gender</slot>
+        <slot name="label">
+            <label :for="this.id">Gender</label>
+        </slot>
         <transition name="fade">
             <span class="help-block" v-if="hasError" v-text="error"></span>
         </transition>

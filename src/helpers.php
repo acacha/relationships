@@ -9,9 +9,7 @@ use Acacha\Relationships\Models\Location;
 use Acacha\Relationships\Models\Person;
 use Acacha\Relationships\Models\Photo;
 use App\User;
-use Carbon\Carbon;
 use Faker\Factory;
-use Illuminate\Http\UploadedFile;
 use Spatie\Permission\PermissionRegistrar;
 
 if (! function_exists('create')) {
@@ -93,8 +91,10 @@ if (! function_exists('initialize_relationships_management_permissions')) {
         //Person
         permission_first_or_create('show-person');
         permission_first_or_create('store-person');
+        permission_first_or_create('update-person');
         give_permission_to_role($manageRelationships,'show-person');
         give_permission_to_role($manageRelationships,'store-person');
+        give_permission_to_role($manageRelationships,'update-person');
 
         //Locations
         permission_first_or_create('list-locations');
@@ -708,6 +708,27 @@ if (! function_exists('create_nif_identifier')) {
     }
 }
 
+if (! function_exists('make_nif_identifier')) {
+    /**
+     * Make NIF identifier.
+     */
+    function make_nif_identifier()
+    {
+        $faker = Factory::create('es_ES');
+
+        $type = IdentifierType::firstOrCreate([
+            'name' => 'NIF'
+        ]);
+
+        $identifier = Identifier::make([
+            'value' => $faker->dni,
+            'type_id' => $type->id
+        ]);
+
+        return $identifier;
+    }
+}
+
 if (! function_exists('create_person_with_nif')) {
     /**
      *Create person with NIF
@@ -716,9 +737,73 @@ if (! function_exists('create_person_with_nif')) {
     {
         $person = factory(Person::class)->states('ca')->create();
         $id = create_nif_identifier();
-        $person->identifiers()->attach($id->id);
+        $person->identifier()->associate($id);
+        $person->save();
+        return $person;
+    }
+}
+
+if (! function_exists('create_person')) {
+    /**
+     * Create person.
+     *
+     * @param null $identifier
+     * @return array
+     */
+    function create_person($identifier = null) {
+        $faker = Factory::create('es_ES');
+
+        $gender = $faker->randomElements(['male', 'female']);
+        $givenName = $faker->firstName($gender[0]);
+        $surname1 = $faker->lastName;
+        $surname2 = $faker->lastName;
+        $birthplace = factory(Location::class)->create();
+
+        $person = [
+            'givenName' => $givenName,
+            'surname1' => $surname1,
+            'surname2' => $surname2,
+            'birthdate' => $faker->date,
+            'birthplace_id' => $birthplace->id,
+            'birthplace' => $birthplace->name,
+            'gender' => $gender[0],
+            'civil_status' => random_civil_status(),
+            'notes' => $faker->paragraph
+        ];
+
+        if ( $identifier ) {
+            return array_merge (
+                [
+                    'identifier' => $identifier->value,
+                    'identifier_id' => $identifier->id,
+                    'identifier_type' => $identifier->type_id,
+                ],
+                $person
+            );
+        }
 
         return $person;
+    }
+}
+
+if (! function_exists('create_person_with_nif_array')) {
+    /**
+     *Create person with NIF in array format
+     */
+    function create_person_with_nif_array()
+    {
+        $identifier = make_nif_identifier();
+        return create_person($identifier);
+    }
+}
+
+if (! function_exists('random_civil_status')) {
+    function random_civil_status()
+    {
+        $faker = Factory::create();
+        return $faker->randomElements(
+            ['Soltero/a','Casado/a','Separado/a','Divorciado/a','Viudo/a']
+        )[0];
     }
 }
 

@@ -51,6 +51,14 @@ class Identifier extends Model
     }
 
     /**
+     * Get the person that owns the identifier.
+     */
+    public function person()
+    {
+        return $this->hasOne(Person::class);
+    }
+
+    /**
      * Get the persons that owns the identifier.
      */
     public function persons()

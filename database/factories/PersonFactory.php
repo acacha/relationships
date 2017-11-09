@@ -24,9 +24,7 @@ $factory->define(Person::class, function (Faker $faker) {
         'birthdate' => $faker->date,
         'birthplace_id' => $location->id,
         'gender' => $gender[0],
-        'civil_status' => $faker->randomElements(
-            ['Soltero/a','Casado/a','Separado/a','Divorciado/a','Viudo/a']
-        )[0],
+        'civil_status' => random_civil_status(),
         'notes' => $faker->sentence
     ];
 });

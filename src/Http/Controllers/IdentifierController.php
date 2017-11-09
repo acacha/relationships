@@ -21,7 +21,7 @@ class IdentifierController extends Controller
     {
         $identifiers = [];
         // NOTE: avoid retrieving all persons relationship to avoid crossed relations loop!
-        foreach (Identifier::has('persons')->with(array('persons'=>function($query){
+        foreach (Identifier::has('person')->with(array('persons'=>function($query){
             $query->select('people.id');
         }))->get() as $identifier) {
 
@@ -30,7 +30,7 @@ class IdentifierController extends Controller
                 'value' => $identifier->value,
                 'type_id' => $identifier->type_id,
                 'type_name' => $identifier->type_name,
-                'person_id' => $identifier->persons()->first()->pivot->person_id
+                'person_id' => $identifier->person->id
             ];
         }
 

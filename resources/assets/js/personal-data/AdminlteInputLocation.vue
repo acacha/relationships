@@ -1,7 +1,9 @@
 <!-- Vue component -->
 <template>
     <div class="form-group has-feedback" :class="{ 'has-error': hasError }">
-        <slot :for="this.id" name="label">Location</slot>
+        <slot name="label">
+            <label :for="this.id">Gender</label>
+        </slot>
         <transition name="fade">
             <span class="help-block" v-if="hasError" v-text="error"></span>
         </transition>
@@ -16,7 +18,6 @@
 
   import moment from 'moment';
   import Multiselect from 'vue-multiselect'
-  import { wait } from '../utils.js'
 
   export default {
     components: { Multiselect },
@@ -70,7 +71,7 @@
       fetchLocations() {
         const url = '/api/v1/location'
         this.loading = true
-        axios.get(url).then(wait(1000)).then( (response) => {
+        axios.get(url).then( (response) => {
           this.locations = response.data
         }).catch( (error) => {
           console.log(error)

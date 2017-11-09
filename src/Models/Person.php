@@ -22,9 +22,8 @@ class Person extends Model implements Stateful
      * @var array
      */
     protected $fillable = [
-        'name',
+        'identifier_id',
         'givenName',
-        'surname',
         'surname1',
         'surname2',
         'birthdate',
@@ -42,14 +41,14 @@ class Person extends Model implements Stateful
      *
      * @var array
      */
-    public $with = ['identifiers','birthplace'];
+    public $with = ['identifier','identifiers','birthplace'];
 
     /**
      * The accessors to append to the model's array form.
      *
      * @var array
      */
-    protected $appends = ['identifier','identifier-id','identifier-type','birthplace-name'];
+    protected $appends = ['identifier-value','identifier-type','birthplace-name','name'];
 
     /**
      * Transaction States
@@ -89,13 +88,46 @@ class Person extends Model implements Stateful
     }
 
     /**
+     * Set the user's given name.
+     *
+     * @param  string  $value
+     * @return void
+     */
+    public function setGivenNameAttribute($value)
+    {
+        $this->attributes['givenName'] = title_case($value);
+    }
+
+    /**
+     * Set the user's surname 1.
+     *
+     * @param  string  $value
+     * @return void
+     */
+    public function setSurname1Attribute($value)
+    {
+        $this->attributes['surname1'] = title_case($value);
+    }
+
+    /**
+     * Set the user's surname 2.
+     *
+     * @param  string  $value
+     * @return void
+     */
+    public function setSurname2Attribute($value)
+    {
+        $this->attributes['surname2'] = title_case($value);
+    }
+
+    /**
      * Get the persons's identifier.
      *
      * @return string
      */
-    public function getIdentifierAttribute()
+    public function getIdentifierValueAttribute()
     {
-        return $this->identifiers->first() ? $this->identifiers->first()->value : '';
+        return $this->identifier ? $this->identifier->value : '';
     }
 
     /**
@@ -105,17 +137,7 @@ class Person extends Model implements Stateful
      */
     public function getIdentifierTypeAttribute()
     {
-        return $this->identifiers->first() ? $this->identifiers->first()->type_id : '';
-    }
-
-    /**
-     * Get the persons's identifier.
-     *
-     * @return string
-     */
-    public function getIdentifierIdAttribute()
-    {
-        return $this->identifiers->first() ? $this->identifiers->first()->id : '';
+        return $this->identifier ? $this->identifier->type_id : '';
     }
 
     /**
@@ -154,6 +176,15 @@ class Person extends Model implements Stateful
     public function birthplace()
     {
         return $this->belongsTo(Location::class,'birthplace_id');
+    }
+
+
+    /**
+     * The identifier that belongs to the person.
+     */
+    public function identifier()
+    {
+        return $this->belongsTo(Identifier::class);
     }
 
     /**

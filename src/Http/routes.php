@@ -17,6 +17,7 @@ Route::group(['middleware' => 'api','prefix' => 'api/v1', 'middleware' => ['thro
         //Persons
         Route::get('/person/{person}',          'PersonController@show');
         Route::post('/person',                  'PersonController@store');
+        Route::put('/person/{person}',          'PersonController@update');
 
         //Person photos
         Route::get('/person/{id}/photos',       'PersonPhotoController@index');

@@ -5,6 +5,6 @@ use Faker\Generator as Faker;
 
 $factory->define(IdentifierType::class, function (Faker $faker) {
     return [
-        'name' => $faker->word
+        'name' => $faker->unique()->word
     ];
 });

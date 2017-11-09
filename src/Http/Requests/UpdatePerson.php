@@ -7,11 +7,11 @@ use Auth;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * Class StorePerson.
+ * Class UpdatePerson.
  *
  * @package Acacha\Relationships\Http\Requests
  */
-class StorePerson extends FormRequest
+class UpdatePerson extends FormRequest
 {
 
     use CanDisableAndRestrictValidation;
@@ -23,7 +23,7 @@ class StorePerson extends FormRequest
      */
     public function authorize()
     {
-        if (Auth::user()->can('store-person')) return true;
+        if (Auth::user()->can('update-person')) return true;
         return false;
     }
 

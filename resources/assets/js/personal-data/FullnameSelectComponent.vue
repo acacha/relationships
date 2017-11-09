@@ -59,7 +59,7 @@
         this.$emit('selected',fullname)
       },
       customLabel({ name, identifier}) {
-        return `${name} - ${identifier}`
+        return identifier ? `${name} - ${identifier}` : `${name}`
       },
       fetchFullnames() {
         let url = '/api/v1/fullname'
