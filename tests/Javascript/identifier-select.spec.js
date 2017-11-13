@@ -1,96 +1,147 @@
-import { mount } from 'vue-test-utils'
+import { shallow } from 'vue-test-utils'
 import expect from 'expect'
 import IdentifierSelect from '../../../relationships/resources/assets/js/personal-data/IdentifierSelectComponent.vue'
 import moxios from 'moxios'
+import axios from 'axios'
 
 describe('IdentifierSelect', () => {
+
+  let component
+
+  const PASSPORT = {
+    id: 2,
+    name: 'Passport',
+  }
+
+  const identifierTypes = [
+    PASSPORT,
+    {
+      id: 2,
+      name: 'Passport',
+    },
+    {
+      id: 3,
+      name: 'NIE',
+    }
+  ]
+
+  const identifiers = [
+    {
+      id: 1,
+      value: '56531534H',
+      type_id: 1,
+      type_name: 'NIF',
+      person_id: 1
+    },
+    {
+      id: 2,
+      value: 'Z7493495P',
+      type_id: 3,
+      type_name: 'NIE',
+      person_id: 2
+    },
+    {
+      id: 3,
+      value: 'YU3581707',
+      type_id: 2,
+      type_name: 'Passport',
+      person_id: 3
+    },
+  ]
+
   beforeEach(() => {
-    moxios.install()
+    moxios.install(axios)
+    component = shallow(IdentifierSelect)
+
   })
 
   afterEach(() => {
-    moxios.uninstall()
+    moxios.uninstall(axios)
   })
 
   it('contains default label', () => {
-    // moxios.stubRequest('/api/v1/identifier', {
-    //   status: 200,
-    //   response: [
-    //       {
-    //         name: 'NIF'
-    //       }
-    //     ]
-    //   }
-    // )
-    const component = mount(IdentifierSelect)
-    // moxios.wait(function() {
-    //   expect(component.html()).toContain('Identifier')
-    //   done()
-    // })
+    expect(component.html()).toContain('Identifier')
   })
 
-  // it('label can be setted', () => {
-  //   const component = mount(IdentifierSelect, {
-  //     slots: {
-  //       label: '<div>Cool id</div>'
-  //     }
-  //   })
-  //
-  //   expect(component.html()).toContain('Cool id')
-  // })
-  //
-  // it('contains default id', () => {
-  //   let date = component.find('input')
-  //   expect(date.element.id).toBe('date')
-  // })
-  //
-  // it('contains default name', () => {
-  //   let date = component.find('input')
-  //   expect(date.element.name).toBe('date')
-  // })
-  //
-  // it('name and id could be setted', () => {
-  //   component.setProps({
-  //     id: 'birthdate',
-  //     name: 'birthdate',
-  //   })
-  //   let date = component.find('input')
-  //   expect(date.element.id).toBe('birthdate')
-  //   expect(date.element.name).toBe('birthdate')
-  // })
-  //
-  // it('accepts a date', () => {
-  //   expect(component.contains('input')).toBe(true)
-  // })
-  //
-  // it('can be disabled', () => {
-  //   component.setProps({ disabled: true })
-  //
-  //   let date = component.find('input')
-  //
-  //   expect(date.element.disabled).toBe(true)
-  //
-  // })
-  //
-  // it('changes the date', () => {
-  //   let date = component.find('input')
-  //
-  //   date.element.value = '02031978'
-  //   date.trigger('input')
-  //   date.trigger('change')
-  //
-  //   expect(component.vm.newDate).toBe('1978-03-02 12:00:00')
-  //   // expect(component.vm.localeDate).toBe('02-03-1978')
-  //
-  // })
-  //
-  // it('broadcast the changed date', () => {
-  //   let date = component.find('input')
-  //
-  //   date.element.value = '02031978'
-  //   date.trigger('input')
-  //   date.trigger('change')
-  //   expect(component.emitted().change).toBeTruthy()
-  //   expect(component.emitted().change[0]).toEqual(['1978-03-02 12:00:00'])
-  // })
+  it('label can be setted', () => {
+    const component = shallow(IdentifierSelect, {
+      slots: {
+        label: '<div>Cool id</div>'
+      }
+    })
+
+    expect(component.html()).toContain('Cool id')
+  })
+
+  it('identifier types are set ok', done => {
+    // component.setProps({ location: 1 })
+
+    moxios.stubRequest('/api/v1/identifierType', {
+      status: 200,
+      response: identifierTypes
+    });
+
+    moxios.wait(() => {
+      expect(component.vm.identifierTypes).toBe(identifierTypes)
+      expect(component.vm.identifierType).toBe(identifierTypes[0])
+      expect(component.vm.identifierTypeName).toBe(identifierTypes[0].name)
+      see(identifierTypes[0].name,'button#identifierType')
+      done();
+    });
+  })
+
+  it('identifier types are set ok with selected', done => {
+    component.setProps({ selected: 'Passport' })
+
+    moxios.stubRequest('/api/v1/identifierType', {
+      status: 200,
+      response: identifierTypes
+    });
+
+    moxios.wait(() => {
+      expect(component.vm.identifierTypes).toBe(identifierTypes)
+      expect(component.vm.identifierType).toBe(identifierTypes[1])
+      see(identifierTypes[1].name,'button#identifierType')
+      done();
+    });
+  })
+
+  it('identifiers are set ok', done => {
+    // component.setProps({ location: 1 })
+
+    moxios.stubRequest('/api/v1/identifier', {
+      status: 200,
+      response: identifiers
+    });
+
+    moxios.wait(() => {
+      expect(component.vm.identifiers).toBe(identifiers)
+      done();
+    });
+  })
+
+  it('identifier types are changed ok', () => {
+    component.vm.selectIdentifierType(PASSPORT)
+    expect(component.vm.identifierType).toBe(PASSPORT)
+  })
+
+// Helper Functions
+
+  let see = (text, selector) => {
+    let wrap = selector ? component.find(selector) : component;
+
+    expect(wrap.html()).toContain(text);
+  };
+
+  let type = (text, selector) => {
+    let node = component.find(selector);
+
+    node.element.value = text;
+    node.trigger('input');
+  };
+
+  let click = selector => {
+    component.find(selector).trigger('click');
+  };
+
 })

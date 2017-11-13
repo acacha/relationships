@@ -1,17 +1,17 @@
-<!-- Vue component -->
 <template>
     <div class="form-group has-feedback" :class="{ 'has-error': hasError }">
         <transition name="fade">
             <label class="help-block" v-if="hasError" v-text="error"></label>
             <slot name="label" v-else>
-                <label :for="this.id">Identifier</label>
+                <label>Identifier</label>
             </slot>
         </transition>
         <div class="input-group">
             <div class="input-group-btn">
-                <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
+                <button id="identifierType" type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
                     {{ identifierTypeName }}
-                    <span class="fa fa-caret-down"></span></button>
+                    <span class="fa fa-caret-down"></span>
+                </button>
                 <ul class="dropdown-menu">
                     <li v-for="identifierType in identifierTypes" @click="selectIdentifierType(identifierType)"><a href="#">{{ identifierType.name }}</a></li>
                 </ul>
@@ -27,6 +27,7 @@
 </template>
 
 <script>
+
   import Multiselect from 'vue-multiselect'
   import axios from 'axios'
 
@@ -160,7 +161,7 @@
     },
     mounted() {
       this.fetchIdentifierTypes()
-//      this.fetchIdentifiers()
+      this.fetchIdentifiers()
     }
   }
 </script>

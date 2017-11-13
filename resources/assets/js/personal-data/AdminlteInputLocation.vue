@@ -74,6 +74,7 @@
         this.loading = true
         axios.get(url).then( (response) => {
           this.locations = response.data
+          this.internalLocation = this.findLocationById(this.location)
         }).catch( (error) => {
           console.log(error)
         }).then( () => {
@@ -83,7 +84,6 @@
     },
     mounted() {
       this.fetchLocations()
-      this.internalLocation = this.findLocationById(this.location)
     }
   }
 
