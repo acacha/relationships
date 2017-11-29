@@ -8,7 +8,7 @@
                     <span class="fa fa-caret-down"></span>
                 </button>
                 <ul class="dropdown-menu">
-                    <li v-for="identifierType in identifierTypes" @click="selectIdentifierType(identifierType)"><a href="#">{{ identifierType.name }}</a></li>
+                    <li v-for="identifierType in identifierTypes" @click="updateIdentifierType(identifierType)"><a href="#">{{ identifierType.name }}</a></li>
                 </ul>
             </div>
             <multiselect
@@ -17,7 +17,7 @@
                     :taggable="true"
                     @tag="addIdentifier"
                     tag-placeholder="Add this as new identifier"
-                    :value="internalIdentifier"
+                    :value="identifier"
                     @select="updateIdentifier"
                     track-by="id"
                     :options="identifiers"
@@ -46,18 +46,32 @@
     data () {
       return {
         loading: false,
-        internalIdentifier: null,
         identifiers: [],
         identifierTypes: [],
-        identifierType : null
       }
     },
     computed: {
       identifierTypeName() {
-        return this.identifierType ? this.identifierType.name : ''
+        return this.identifier_type ? this.identifier_type.name : ''
+      },
+      identifier() {
+        return this.identifierObject()
+      },
+      identifier_type() {
+        return this.identifierTypeObject()
       }
     },
     methods: {
+      identifierObject() {
+        return this.identifiers.find((identifier) => {
+          return identifier.id == this.$store.state.form.identifier_id
+        })
+      },
+      identifierTypeObject() {
+        return this.identifierTypes.find((identifierType) => {
+          return identifierType.id == this.$store.state.form.identifier_type
+        })
+      },
       customLabel({ value, type_name}) {
         return `${value} - ${type_name}`
       },
@@ -67,31 +81,25 @@
         }
       },
       addIdentifier(newIdentifier) {
-        const identifier = {
-          value: newIdentifier,
-          type_id: this.identifierType.id,
-          type: this.identifierType,
-          type_name: this.identifierType.name
-        }
-        this.identifiers.push(identifier)
-        this.internalIdentifier = identifier
-        this.$emit('tag', identifier)
+//        const identifier = {
+//          value: newIdentifier,
+//          type_id: this.identifierType.id,
+//          type: this.identifierType,
+//          type_name: this.identifierType.name
+//        }
+//        this.identifiers.push(identifier)
+////        this.internalIdentifier = identifier
+//        this.$emit('tag', identifier)
       },
-      selectIdentifierType(identifierType) {
-        this.identifierType = identifierType
-        if (this.internalIdentifier) {
-          this.internalIdentifier.type = identifierType
-          this.internalIdentifier.type_id = identifierType.id
-          this.internalIdentifier.type_name = identifierType.name
+      updateIdentifierType(identifierType) {
+        console.log(identifierType)
+        let id = identifierType ? identifierType.id : ''
+        console.log(id)
+        this.$store.dispatch('updateFormFieldAction', {
+          field : 'identifier_type',
+          value : id
+        });
 
-          let id = this.identifiers.find((identifier) => {
-            return identifier.id === this.internalIdentifier.id
-          })
-
-            id.type = identifierType
-            id.type_id = identifierType.id
-            id.type_name = identifierType.name
-        }
       },
       fetchIdentifiers() {
         let url = '/api/v1/identifier'

@@ -63,8 +63,8 @@
     },
     methods: {
       updateLocation(location) {
-        let value = location ? location.id : ''
-        this.updateFormField(value)
+        let location_id = location ? location.id : ''
+        this.updateFormField(location_id)
       },
       customLabel({ name }) {
         return `${name}`
