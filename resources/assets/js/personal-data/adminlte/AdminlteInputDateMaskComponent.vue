@@ -20,7 +20,7 @@
                    :id="id"
                    :name="name"
                    :value="localeDate"
-                   @change="updateField(name, $event.target.value)"
+                   @change="updateDate($event.target.value)"
                    :disabled="internalForm.submitting">
         </div>
 
@@ -38,6 +38,7 @@
   import { toLaravelDate, fromLaravelDate } from "./LaravelDates"
 
   export default {
+    name: 'AdminLTEInputDateMask',
     mixins: [ formWidget ],
     data () {
       return {
@@ -66,15 +67,13 @@
       },
     },
     methods: {
-      updateField(field, date) {
-        let value = ''
-        if (date) value = toLaravelDate(date)
-        this.$store.commit('updateForm', {field, value});
+      updateDate(date) {
+        date = date ? toLaravelDate(date) : ''
+        this.updateFormField(date)
       }
     },
     mounted() {
       Inputmask().mask(this.$refs.inputDate);
     }
-
   }
 </script>

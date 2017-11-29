@@ -16,11 +16,12 @@ Vue.component('personal-data-subform', require('./personal-data/PersonalDataSubF
 // Vue.component('adminlte-input-location', require('./personal-data/AdminlteInputLocation.vue'));
 
 //Adminlte
-Vue.component('adminlte-input-text',      require('./personal-data/adminlte/AdminlteInputTextComponent.vue'));
-Vue.component('adminlte-input-gender',    require('./personal-data/adminlte/AdminlteInputGenderComponent.vue'));
-Vue.component('adminlte-input-date-mask', require('./personal-data/adminlte/AdminlteInputDateMaskComponent.vue'));
-Vue.component('adminlte-input-location',  require('./personal-data/adminlte/AdminlteInputLocationComponent.vue'));
-Vue.component('adminlte-input-fullnames', require('./personal-data/adminlte/AdminlteInputFullnamesComponent.vue'));
+Vue.component('adminlte-input-text',        require('./personal-data/adminlte/AdminlteInputTextComponent.vue'));
+Vue.component('adminlte-input-gender',      require('./personal-data/adminlte/AdminlteInputGenderComponent.vue'));
+Vue.component('adminlte-input-date-mask',   require('./personal-data/adminlte/AdminlteInputDateMaskComponent.vue'));
+Vue.component('adminlte-input-location',    require('./personal-data/adminlte/AdminlteInputLocationComponent.vue'));
+Vue.component('adminlte-input-fullnames',   require('./personal-data/adminlte/AdminlteInputFullnamesComponent.vue'));
+Vue.component('adminlte-input-identifiers', require('./personal-data/adminlte/AdminlteInputIdentifiersComponent.vue'));
 
 import { config } from './config/relationships'
 

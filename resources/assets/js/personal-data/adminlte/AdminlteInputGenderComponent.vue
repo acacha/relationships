@@ -6,13 +6,16 @@
                 <label key="regular" :for="id">{{placeholder}}</label>
             </slot>
         </transition>
-        <multiselect :id="id"
+        <multiselect :id="name"
                      :name="name"
                      :placeholder="placeholder"
                      :value="gender"
-                     @input="updateField"
+                     @input="updateGender"
                      :options="genders"
+                     track-by="value"
                      select-label=""
+                     deselect-label=""
+                     :show-labels="false"
                      :custom-label="customLabel"
                      :disabled="internalForm.submitting">
         </multiselect>
@@ -40,11 +43,12 @@
   ]
 
   export default {
+    name: 'AdminLTEInputGender',
     components: { Multiselect },
     mixins: [ formWidget ],
     data () {
       return {
-        genders: genders
+        genders: genders,
       }
     },
     props: {
@@ -59,20 +63,20 @@
     },
     computed: {
       gender: function () {
-        return genders.find( gender => {
-          return gender.value === this.internalForm[this.name]
-        })
+        return this.genderObject()
       }
     },
     methods: {
       customLabel({ label }) {
         return `${label}`
       },
-      updateField(gender) {
-        let field = this.name
-        let value = ''
-        if ( gender ) value = gender.value
-        this.$store.commit('updateForm', { field, value});
+      updateGender(gender) {
+        this.updateFormField(gender ? gender.value : '')
+      },
+      genderObject() {
+        return this.genders.find( gender => {
+          return gender.value === this.internalForm[this.name]
+        })
       }
     }
   }

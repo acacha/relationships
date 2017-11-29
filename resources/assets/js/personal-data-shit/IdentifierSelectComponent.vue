@@ -16,11 +16,19 @@
                     <li v-for="identifierType in identifierTypes" @click="selectIdentifierType(identifierType)"><a href="#">{{ identifierType.name }}</a></li>
                 </ul>
             </div>
-            <multiselect id="identifier" v-model="internalIdentifier" :options="identifiers" :custom-label="customLabel"
-                         :taggable="true" @tag="addIdentifier" @select="identifierHasBeenSelected"
+            <multiselect id="identifier"
+                         v-model="internalIdentifier"
+                         :options="identifiers"
+                         :custom-label="customLabel"
+                         :taggable="true"
+                         @tag="addIdentifier"
+                         @select="identifierHasBeenSelected"
                          placeholder="Select identifier"
                          tag-placeholder="Add this as new identifier"
-                         :disabled="disabled" :loading="loading"></multiselect>
+                         :disabled="disabled"
+                         :loading="loading">
+
+            </multiselect>
         </div>
     </div>
 

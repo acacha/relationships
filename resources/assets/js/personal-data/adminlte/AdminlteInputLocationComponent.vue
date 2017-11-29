@@ -11,12 +11,16 @@
                      :name="name"
                      :placeholder="placeholder"
                      :value="location"
-                     @input="updateField"
+                     @input="updateLocation"
                      :options="locations"
                      select-label=""
+                     deselect-label=""
+                     track-by="id"
+                     :show-labels="false"
                      :custom-label="customLabel"
                      :disabled="internalForm.submitting"
-                     :loading="loading">
+                     :loading="loading"
+                     :allow-empty="true">
         </multiselect>
 
     </div>
@@ -33,13 +37,13 @@
   import axios from 'axios'
 
   export default {
+    name: 'AdminLTEInputLocation',
     components: { Multiselect },
     mixins: [ formWidget ],
     data () {
       return {
         locations: [],
         loading: false,
-        location: null
       }
     },
     props: {
@@ -52,34 +56,35 @@
         default: "Select location"
       }
     },
+    computed: {
+      location() {
+        return this.locationObject()
+      }
+    },
     methods: {
+      updateLocation(location) {
+        let value = location ? location.id : ''
+        this.updateFormField(value)
+      },
       customLabel({ name }) {
         return `${name}`
-      },
-      updateField(location) {
-        let field = this.name
-        let value = ''
-        if (location) value = location.id
-        this.$store.commit('updateForm', { field, value});
       },
       fetchLocations() {
         const url = '/api/v1/location'
         this.loading = true
         axios.get(url).then( (response) => {
           this.locations = response.data
-          this.location = this.findLocationById(this.internalForm[this.name])
         }).catch( (error) => {
           console.log(error)
         }).then( () => {
           this.loading = false
         })
       },
-      findLocationById(locationId){
-        if (!locationId) return null
+      locationObject(){
         return this.locations.find((location) => {
-          return location.id == locationId
+          return location.id === this.internalForm[this.name]
         })
-      },
+      }
     },
     mounted() {
       this.fetchLocations()

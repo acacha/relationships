@@ -12,7 +12,7 @@
                :placeholder="placeholder"
                :name="name"
                :value="internalForm[name]"
-               @keyup.stop="updateField(name, $event.target.value)"
+               @keyup.stop="update($event.target.value)"
                :disabled="internalForm.submitting">
     </div>
 </template>
@@ -24,6 +24,18 @@
  import formWidget from './FormWidget'
 
   export default {
-    mixins: [ formWidget ]
+    name: 'AdminLTEInputText',
+    mixins: [ formWidget ],
+    methods: {
+      update (value) {
+        this.updateFormField(this.trim(value))
+      },
+      trim (value) {
+        if (typeof value === 'string' || value instanceof String) {
+          return value.trim()
+        }
+        return value
+      }
+    }
   }
 </script>

@@ -11,9 +11,13 @@ export default {
     }
   },
   methods: {
-    updateField(field, value) {
-      this.$store.commit('updateForm', {field, value});
-    }
+    updateFormField(value,field) {
+      field = field || this.name;
+      this.$store.dispatch('updateFormFieldAction', {
+        field : field,
+        value : value
+      });
+    },
   },
   props: {
     name: {

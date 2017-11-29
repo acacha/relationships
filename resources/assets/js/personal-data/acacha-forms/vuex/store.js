@@ -9,15 +9,26 @@ export default function(form) {
 
   const initialForm = form
 
+  let assignValueTofield = function (state, {field, value}) {
+    Object.assign(state.form, {
+      [field]: value
+    });
+  }
+
   return new Vuex.Store({
       state: {
         form: form,
+        loading: false
       },
       mutations: {
-        updateForm: function (state, {field, value}) {
-          Object.assign(state.form, {
-            [field]: value
-          });
+        updateLoading: function(state, loading) {
+          state.loading = loading
+        },
+        updateFormField: assignValueTofield,
+        updateForm: function (state, fields) {
+          fields.forEach( field => {
+            assignValueTofield(state, field)
+          })
         },
         startProcessing (state) {
           state.form.startProcessing()
@@ -33,6 +44,15 @@ export default function(form) {
         },
       },
       actions: {
+        updateLoadingAction ({commit} ,loading) {
+          commit('updateLoading', loading)
+        },
+        updateFormFieldAction ({commit} ,field) {
+          commit('updateFormField', field)
+        },
+        updateFormAction ({commit} ,fields) {
+          commit('updateForm', fields)
+        },
         post(context, payload) {
           return context.dispatch('submit',{
             requestType: 'post',
