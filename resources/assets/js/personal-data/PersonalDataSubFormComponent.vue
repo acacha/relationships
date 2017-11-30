@@ -42,13 +42,13 @@
                     <div class="row">
 
                         <div class="col-md-4">
-                            <adminlte-input-date-mask name="birthdate"></adminlte-input-date-mask>
-                        </div>
-
-                        <div class="col-md-4">
                             <adminlte-input-location name="birthplace_id" placeholder="Select birthplace">
                                 <label slot="label">Birth place</label>
                             </adminlte-input-location>
+                        </div>
+
+                        <div class="col-md-4">
+                            <adminlte-input-date-mask name="birthdate"></adminlte-input-date-mask>
                         </div>
 
                         <div class="col-md-4">
@@ -64,11 +64,20 @@
                     <i class="fa fa-refresh fa-spin"></i>
                 </div>
                 <div class="box-footer vertical-align-content">
+                    <button type="button" class="btn mr" @click="confirmClear" v-if="!clearing">Clear</button>
+                    <div v-else class="mr">
+                        Sure? <i class="fa fa-check green" @click="clear"></i> <i class="fa fa-remove red" @click="clearing = false;" ></i>
+                    </div>
+                    <!--<div>-->
+                        <!--Validation: <toggle-button @change="toogleValidation" :value="validation" :sync="true" :labels="true" class="mr"></toggle-button>-->
+                    <!--</div>-->
+                    <!--<div v-if="validation">-->
+                        <!--Strict: <toggle-button @change="toogleStrictValidation" :value="strictValidation" :sync="true" :labels="true" class="mr"></toggle-button>-->
+                    <!--</div>-->
                     <button type="submit" class="btn btn-primary" :disabled="form.submitting || form.errors.any()">
-                        <template v-if="form.submitting"><i class="fa fa-refresh fa-spin"></i> Creating</template>
-                        <template v-else>Create</template>
+                        <template v-if="form.submitting"><i class="fa fa-refresh fa-spin"></i></template>
+                        {{ action }}
                     </button>
-
                 </div>
             </form>
         </div>
@@ -88,7 +97,20 @@
 </template>
 
 <style>
-
+    .vertical-align-content {
+        display:flex;
+        align-items:center;
+        justify-content: flex-end
+    }
+    .mr {
+        margin-right: 1em;
+    }
+    .red {
+        color: red;
+    }
+    .green {
+        color: green;
+    }
 </style>
 
 <script>
@@ -97,10 +119,13 @@
 
   import Form from './acacha-forms/vuex/Form'
 
-  let store = formStore(new Form({
+  import ToggleButton from 'vue-js-toggle-button'
+  Vue.use(ToggleButton)
+
+  const initialForm = new Form({
     identifier_id: '',
     identifier: '',
-    identifier_type: '',
+    identifier_type: 1,
     person_id: '',
     givenName: '',
     surname1: '',
@@ -108,16 +133,38 @@
     birthdate: '',
     birthplace_id: '',
     gender: ''
-  }))
+  })
+
+  let store = formStore(initialForm)
 
   export default {
     store,
+    data () {
+      return {
+        clearing: false,
+      }
+    },
     computed: {
       loading() {
         return this.$store.state.loading
       },
       form() {
         return this.$store.state.form
+      },
+      action() {
+        if (this.form.submitting) {
+          if(this.$store.state.action === formStore.UPDATE_ACTION ) {
+            return 'Updating';
+          } else {
+            return 'Creating';
+          }
+        } else {
+          if(this.$store.state.action === formStore.UPDATE_ACTION ) {
+            return 'Update';
+          } else {
+            return 'Create';
+          }
+        }
       }
     },
     methods: {
@@ -126,12 +173,25 @@
           console.log('OK!!!!!!!!!!!!!!')
           console.log(response)
         }).catch( error => {
-          console.log('ERROR    !!!!!!!!!!!!!!')
-          console.log('Register error: ' + error)
+          console.log('Submit error: ' + error)
         })
       },
-      clearErrors (name) {
-        this.form.errors.clear(name)
+      confirmClear() {
+        this.clearing = true
+      },
+      clear(){
+        this.$store.dispatch('resetFormAction')
+        this.clearing = false
+      },
+      toogleValidation() {
+//        this.validation = !this.validation
+//        this.strictValidation= this.validation
+      },
+      toogleStrictValidation() {
+//        this.strictValidation = !this.strictValidation
+      },
+      clearErrors (fieldName) {
+        this.$store.dispatch('clearErrorsAction', fieldName)
       }
     }
   }

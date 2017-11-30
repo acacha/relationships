@@ -29,20 +29,20 @@
     </div>
 </template>
 
-<style>
-
-</style>
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
 
 <script>
 
   import Multiselect from 'vue-multiselect'
   import axios from 'axios'
   import FetchPerson from './FetchPerson'
+  import FetchPersonUpdateForm from './FetchPersonUpdateForm'
+  import UpdateForm from './UpdateForm'
 
   export default {
     name: 'AdminlteInputIdentifiersComponent',
     components: {Multiselect},
-    mixins: [ FetchPerson ],
+    mixins: [ FetchPerson, FetchPersonUpdateForm, UpdateForm ],
     data () {
       return {
         loading: false,
@@ -77,24 +77,34 @@
       },
       updateIdentifier(identifier) {
         if (identifier) {
-          this.fetchPerson(identifier.person_id)
+          if (identifier.id !== -1) // -1 New identifier -> no person associated -> avoid search
+            this.fetchPersonAndUpdateForm(identifier.person_id)
         }
       },
       addIdentifier(newIdentifier) {
-//        const identifier = {
-//          value: newIdentifier,
-//          type_id: this.identifierType.id,
-//          type: this.identifierType,
-//          type_name: this.identifierType.name
-//        }
-//        this.identifiers.push(identifier)
-////        this.internalIdentifier = identifier
-//        this.$emit('tag', identifier)
+        const identifier = {
+          id : -1,
+          person_id: -1,
+          type_id: this.identifier_type.id,
+          type_name: this.identifier_type.name,
+          value: newIdentifier
+        }
+        if ( this.identifiers[0].id === -1 ){
+          this.identifiers.shift()
+        }
+        this.identifiers.splice(0,0,identifier)
+        this.$store.dispatch('updateFormFieldAction', {
+          field : 'identifier',
+          value : newIdentifier
+        })
+        this.$store.dispatch('updateFormFieldAction', {
+          field : 'identifier_id',
+          value : -1
+        })
+        this.$emit('tag', identifier)
       },
       updateIdentifierType(identifierType) {
-        console.log(identifierType)
         let id = identifierType ? identifierType.id : ''
-        console.log(id)
         this.$store.dispatch('updateFormFieldAction', {
           field : 'identifier_type',
           value : id

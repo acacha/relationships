@@ -1,16 +1,5 @@
 export default {
   methods: {
-    fetchPerson(personId) {
-      this.$store.dispatch('updateLoadingAction', true)
-      let url = '/api/v1/person/' + personId
-      axios.get(url).then( response => {
-        this.updateForm(response.data)
-      }).catch( (error) => {
-        console.log(error)
-      }).then( () => {
-        this.$store.dispatch('updateLoadingAction', false)
-      })
-    },
     updateForm(person) {
       const fields = [
         {

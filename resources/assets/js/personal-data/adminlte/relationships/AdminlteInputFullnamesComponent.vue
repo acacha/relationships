@@ -16,17 +16,18 @@
 
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
 
-
 <script>
 
   import Multiselect from 'vue-multiselect'
   import axios from 'axios'
   import FetchPerson from './FetchPerson'
+  import FetchPersonUpdateForm from './FetchPersonUpdateForm'
+  import UpdateForm from './UpdateForm'
 
   export default {
     name: 'AdminlteInputFullnames',
     components: {Multiselect},
-    mixins: [ FetchPerson ],
+    mixins: [ FetchPerson, FetchPersonUpdateForm, UpdateForm ],
     data () {
       return {
         fullnames: [],
@@ -35,38 +36,39 @@
     },
     computed: {
       fullname() {
-        let currentFullName = this.currentFullNameOnForm()
-        let fullname = this.findFullNameByFullname(currentFullName)
-        if( fullname) return fullname
-        this.fullnames.splice(0,0,{
-          name : currentFullName,
-          identifier: this.$store.state.form.identifier,
-          identifier_id: this.$store.state.form.identifier_id
+        if (this.fullNameString === '') {
+          return null
+        }
+        let fullNameFound =  this.fullnames.find((fullname) => {
+          return fullname.name === this.fullNameString
         })
-        return this.fullnames[0]
-      }
-    },
-    methods: {
-      findFullNameByIdentifierId(id){
-        return this.fullnames.find((fullname) => {
-          return fullname.identifier_id === id
-        })
+        if (fullNameFound) {
+          return fullNameFound
+        }
+        const fullname = {
+          id: -1,
+          identifier: -1,
+          identifier_id: -1,
+          name: this.fullNameString
+        }
+        if ( this.fullnames[0].id === -1 ){
+          this.fullnames.shift()
+        }
+        this.fullnames.splice(0,0,fullname)
+        return fullname
       },
-      findFullNameByFullname(fullnameToSearch){
-        return this.fullnames.find((fullname) => {
-          return fullname.name === fullnameToSearch
-        })
-      },
-      currentFullNameOnForm() {
+      fullNameString() {
         let fullname =  this.$store.state.form.givenName + ' ' + this.$store.state.form.surname1 + ' ' +this.$store.state.form.surname2
         return fullname.trim()
       },
+    },
+    methods: {
       customLabel({ name, identifier}) {
-        return identifier ? `${name} - ${identifier}` : `${name}`
+        return identifier !==-1 ? `${name} - ${identifier}` : `${name}`
       },
       updateFullname(fullname) {
         if (fullname) {
-          this.fetchPerson(fullname.id)
+          this.fetchPersonAndUpdateForm(fullname.id)
         }
       },
       fetchFullnames() {

@@ -9,6 +9,8 @@ export default function(form) {
 
   const initialForm = form
 
+  const CREATE_ACTION = 'create', UPDATE_ACTION = 'update'
+
   let assignValueTofield = function (state, {field, value}) {
     Object.assign(state.form, {
       [field]: value
@@ -18,14 +20,24 @@ export default function(form) {
   return new Vuex.Store({
       state: {
         form: form,
-        loading: false
+        loading: false,
+        action: CREATE_ACTION
       },
       mutations: {
-        updateLoading: function(state, loading) {
+        clearErrors(state, field) {
+          state.form.errors.clear(field)
+        },
+        resetForm(state) {
+          state.form.reset()
+        },
+        updateLoading(state, loading) {
           state.loading = loading
         },
+        updateAction(state, action) {
+          state.action = action
+        },
         updateFormField: assignValueTofield,
-        updateForm: function (state, fields) {
+        updateForm (state, fields) {
           fields.forEach( field => {
             assignValueTofield(state, field)
           })
@@ -44,8 +56,18 @@ export default function(form) {
         },
       },
       actions: {
+        clearErrorsAction ({commit} , field) {
+          commit('clearErrors', field)
+        },
+        resetFormAction ({commit} ) {
+          commit('resetForm')
+          commit('updateAction',CREATE_ACTION)
+        },
         updateLoadingAction ({commit} ,loading) {
           commit('updateLoading', loading)
+        },
+        updateActionAction ({commit} , action) {
+          commit('updateAction', action)
         },
         updateFormFieldAction ({commit} ,field) {
           commit('updateFormField', field)

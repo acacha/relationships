@@ -22,13 +22,13 @@
     </div>
 </template>
 
-<style src="./fade.css" />
+<style src="./fade.css"></style>
 
-<style src="vue-multiselect/dist/vue-multiselect.min.css" />
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
 
 <script>
 
-  import formWidget from './FormWidget'
+  import formWidget from '../FormWidget'
   import Multiselect from 'vue-multiselect'
 
   const genders = [
