@@ -31,31 +31,15 @@
     data () {
       return {
         fullnames: [],
-        loading: false,
+        loading: false
       }
     },
     computed: {
       fullname() {
-        if (this.fullNameString === '') {
-          return null
-        }
-        let fullNameFound =  this.fullnames.find((fullname) => {
-          return fullname.name === this.fullNameString
-        })
-        if (fullNameFound) {
-          return fullNameFound
-        }
-        const fullname = {
-          id: -1,
-          identifier: -1,
-          identifier_id: -1,
-          name: this.fullNameString
-        }
-        if ( this.fullnames[0].id === -1 ){
-          this.fullnames.shift()
-        }
-        this.fullnames.splice(0,0,fullname)
-        return fullname
+        if (this.fullNameString === '') return null
+        let fullNameFound = this.fullnameObject()
+        if (fullNameFound) return fullNameFound
+        return this.addNewFullName()
       },
       fullNameString() {
         let fullname =  this.$store.state.form.givenName + ' ' + this.$store.state.form.surname1 + ' ' +this.$store.state.form.surname2
@@ -63,12 +47,29 @@
       },
     },
     methods: {
+      fullnameObject() {
+        return this.fullnames.find((fullname) => {
+          return fullname.name === this.fullNameString
+        })
+      },
+      addNewFullName() {
+        const fullname = {
+          id: -1,
+          identifier: this.$store.state.form.identifier,
+          identifier_id: this.$store.state.form.identifier_id ? this.$store.state.form.identifier : -1,
+          name: this.fullNameString
+        }
+        if (this.fullnames[0]) if ( this.fullnames[0].id === -1 ) this.fullnames.shift()
+        this.fullnames.splice(0,0, fullname)
+        return fullname
+      },
       customLabel({ name, identifier}) {
-        return identifier !==-1 ? `${name} - ${identifier}` : `${name}`
+        return identifier !==-1 && identifier !== '' ? `${name} - ${identifier}` : `${name}`
       },
       updateFullname(fullname) {
         if (fullname) {
-          this.fetchPersonAndUpdateForm(fullname.id)
+          if (fullname.id !== -1) // -1 New identifier -> no person associated -> avoid search
+            this.fetchPersonAndUpdateForm(fullname.id)
         }
       },
       fetchFullnames() {

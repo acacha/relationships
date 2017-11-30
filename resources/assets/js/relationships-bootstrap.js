@@ -15,6 +15,8 @@ Vue.component('adminlte-input-gender',      require('./personal-data/adminlte/re
 Vue.component('adminlte-input-fullnames',   require('./personal-data/adminlte/relationships/AdminlteInputFullnamesComponent.vue'));
 Vue.component('adminlte-input-identifiers', require('./personal-data/adminlte/relationships/AdminlteInputIdentifiersComponent.vue'));
 
+Vue.component('adminlte-input-identifiers', require('./personal-data/adminlte/relationships/AdminlteInputIdentifiersComponent.vue'));
+
 import { config } from './config/relationships'
 
 window.acacha_relationships = {}

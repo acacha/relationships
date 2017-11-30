@@ -5,11 +5,11 @@ Vue.use(Vuex)
 
 const debug = process.env.NODE_ENV !== 'production'
 
+import {CREATE_ACTION} from './constants.js'
+
 export default function(form) {
 
   const initialForm = form
-
-  const CREATE_ACTION = 'create', UPDATE_ACTION = 'update'
 
   let assignValueTofield = function (state, {field, value}) {
     Object.assign(state.form, {
@@ -21,7 +21,8 @@ export default function(form) {
       state: {
         form: form,
         loading: false,
-        action: CREATE_ACTION
+        action: CREATE_ACTION,
+        person_id: null
       },
       mutations: {
         clearErrors(state, field) {
@@ -45,6 +46,12 @@ export default function(form) {
         startProcessing (state) {
           state.form.startProcessing()
         },
+        clearOnSubmit (state) {
+          state.form.setClearOnSubmit()
+        },
+        updatePersonId (state, personId) {
+          state.person_id = personId
+        },
         onSuccess (state) {
           state.form.onSuccess()
         },
@@ -56,6 +63,12 @@ export default function(form) {
         },
       },
       actions: {
+        updatePersonIdAction ({commit} , personId) {
+          commit('updatePersonId', personId)
+        },
+        clearOnSubmitAction ({commit}) {
+          commit('clearOnSubmit')
+        },
         clearErrorsAction ({commit} , field) {
           commit('clearErrors', field)
         },
@@ -78,6 +91,12 @@ export default function(form) {
         post(context, payload) {
           return context.dispatch('submit',{
             requestType: 'post',
+            url: payload
+          })
+        },
+        put(context, payload) {
+          return context.dispatch('submit',{
+            requestType: 'put',
             url: payload
           })
         },

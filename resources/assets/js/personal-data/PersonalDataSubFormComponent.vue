@@ -1,5 +1,10 @@
 <template>
     <div>
+        <div :class="'alert alert-' + alertColor + ' flash-message ' + alertDismissibleClass" v-if="alertVisible && alertMessage !=''">
+            <button @click="hide" v-if="alertDismissible" type="button" class="close" alert-dismiss="alert" aria-hidden="true">×</button>
+            <h4 v-if="alertTitle"><i :class="'icon fa fa-' + alertIcon"></i> {{ alertTitle }}</h4>
+            {{ alertMessage }}
+        </div>
         <div class="box box-primary">
             <form method="post" @submit.prevent="submit" @keydown="clearErrors($event.target.name)">
                 <div class="box-header with-border">
@@ -64,6 +69,8 @@
                     <i class="fa fa-refresh fa-spin"></i>
                 </div>
                 <div class="box-footer vertical-align-content">
+                    <button type="button" class="btn mr" @click="testFlash">Flash</button>
+
                     <button type="button" class="btn mr" @click="confirmClear" v-if="!clearing">Clear</button>
                     <div v-else class="mr">
                         Sure? <i class="fa fa-check green" @click="clear"></i> <i class="fa fa-remove red" @click="clearing = false;" ></i>
@@ -81,6 +88,8 @@
                 </div>
             </form>
         </div>
+
+        <h4>Form</h4>
         <ul>
             <li>Identifier: {{form.identifier}}</li>
             <li>Identifier_id: {{form.identifier_id}}</li>
@@ -91,7 +100,16 @@
             <li>Gender: {{form.gender}}</li>
             <li>Birthdate: {{form.birthdate}}</li>
             <li>Birthplace id: {{form.birthplace_id}}</li>
-            <li>Person_id: {{form.person_id}}</li>
+        </ul>
+        <h4>Store</h4>
+        <ul>
+            <li> Loading: {{ $store.state.loading }}</li>
+            <li> Action: {{ $store.state.action }}</li>
+            <li> Person_id: {{ $store.state.person_id }}</li>
+        </ul>
+        <h4>Errors</h4>
+        <ul>
+            <li v-for="error in form.errors"> {{ error }}</li>
         </ul>
     </div>
 </template>
@@ -116,13 +134,14 @@
 <script>
 
   import formStore from './acacha-forms/vuex/store'
-
   import Form from './acacha-forms/vuex/Form'
-
   import ToggleButton from 'vue-js-toggle-button'
+  import Alert from './alert.js'
   Vue.use(ToggleButton)
 
-  const initialForm = new Form({
+  import {UPDATE_ACTION} from './acacha-forms/vuex/constants.js'
+
+  let initialForm = new Form({
     identifier_id: '',
     identifier: '',
     identifier_type: 1,
@@ -139,12 +158,22 @@
 
   export default {
     store,
+    mixins: [Alert],
     data () {
       return {
         clearing: false,
+        lastStatusCode: null,
+        lastStatusText: null,
+        lastCreatedUser: null,
+        message: ''
       }
     },
     computed: {
+      lastCreatedUserFullName(){
+        if (!this.lastCreatedUser) return ''
+        let fullname = this.lastCreatedUser.givenName + ' ' + this.lastCreatedUser.surname1 + ' ' + this.lastCreatedUser.surname2
+        return fullname.trim()
+      },
       loading() {
         return this.$store.state.loading
       },
@@ -153,13 +182,13 @@
       },
       action() {
         if (this.form.submitting) {
-          if(this.$store.state.action === formStore.UPDATE_ACTION ) {
+          if(this.$store.state.action === UPDATE_ACTION ) {
             return 'Updating';
           } else {
             return 'Creating';
           }
         } else {
-          if(this.$store.state.action === formStore.UPDATE_ACTION ) {
+          if(this.$store.state.action === UPDATE_ACTION ) {
             return 'Update';
           } else {
             return 'Create';
@@ -168,12 +197,38 @@
       }
     },
     methods: {
+      testFlash() {
+        this.flash('Sergi Tur Badenas has been added to database','User created','success')
+      },
+      flash(message, title, color, icon) {
+        if (typeof window.flash === "function") {
+          window.flash(message, title, color, icon)
+        } else {
+          this.showAlert(message, title, color, icon)
+        }
+      },
       submit() {
-        this.$store.dispatch('post','/api/v1/person').then( response => {
-          console.log('OK!!!!!!!!!!!!!!')
-          console.log(response)
+        var component = this
+        let uri = '/api/v1/person'
+        let action = 'post'
+        if ( this.$store.state.action === UPDATE_ACTION) {
+          uri = '/api/v1/person/' + this.$store.state.person_id
+          action = 'put'
+        }
+        this.$store.dispatch(action,uri).then( response => {
+          this.lastStatusCode = response.status
+          this.lastStatusText = response.statusText
+          this.lastCreatedUser = response.data
+          this.message = 'User created ok!'
+          if (action === 'put') this.message = 'User modified ok!'
+          let actionPart = 'added'
+          if (action === 'put') actionPart = 'modified'
+          let color = 'success'
+          if (action === 'put') color = 'warning'
+          this.flash(this.lastCreatedUserFullName + ' has been ' + actionPart + ' to database', this.message, color);
         }).catch( error => {
-          console.log('Submit error: ' + error)
+          if (error.response.status === 422) return
+          this.flash('' + error, 'Oooppssss something went wrong!', 'danger', 'ban');
         })
       },
       confirmClear() {
@@ -191,8 +246,12 @@
 //        this.strictValidation = !this.strictValidation
       },
       clearErrors (fieldName) {
+        if ( !fieldName ) return
         this.$store.dispatch('clearErrorsAction', fieldName)
       }
-    }
+    },
+    mounted() {
+      this.$store.dispatch('clearOnSubmitAction')
+      }
   }
 </script>

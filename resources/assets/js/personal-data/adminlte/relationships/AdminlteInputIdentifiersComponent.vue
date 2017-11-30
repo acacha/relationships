@@ -1,6 +1,11 @@
 <template>
-    <div class="form-group">
-        <label for="identifier">Identifier</label>
+    <div class="form-group has-feedback" :class="{ 'has-error': internalForm.errors.has(name) }">
+        <transition name="fade">
+            <label key="error" class="help-block" v-if="internalForm.errors.has(name)" v-text="internalForm.errors.get(name)"></label>
+            <slot name="label" v-else>
+                <label key="regular" :for="id">{{placeholder}}</label>
+            </slot>
+        </transition>
         <div class="input-group">
             <div class="input-group-btn">
                 <button id="identifierType" type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
@@ -22,7 +27,8 @@
                     track-by="id"
                     :options="identifiers"
                     :custom-label="customLabel"
-                    :loading="loading">
+                    :loading="loading"
+                    >
             </multiselect>
         </div>
 
@@ -38,11 +44,12 @@
   import FetchPerson from './FetchPerson'
   import FetchPersonUpdateForm from './FetchPersonUpdateForm'
   import UpdateForm from './UpdateForm'
+  import FormWidget from '../FormWidget'
 
   export default {
     name: 'AdminlteInputIdentifiersComponent',
     components: {Multiselect},
-    mixins: [ FetchPerson, FetchPersonUpdateForm, UpdateForm ],
+    mixins: [ FormWidget, FetchPerson, FetchPersonUpdateForm, UpdateForm ],
     data () {
       return {
         loading: false,
@@ -77,6 +84,7 @@
       },
       updateIdentifier(identifier) {
         if (identifier) {
+          this.$store.dispatch('clearErrorsAction', this.name)
           if (identifier.id !== -1) // -1 New identifier -> no person associated -> avoid search
             this.fetchPersonAndUpdateForm(identifier.person_id)
         }
@@ -101,6 +109,7 @@
           field : 'identifier_id',
           value : -1
         })
+        this.$store.dispatch('clearErrorsAction', this.name)
         this.$emit('tag', identifier)
       },
       updateIdentifierType(identifierType) {
@@ -109,7 +118,6 @@
           field : 'identifier_type',
           value : id
         });
-
       },
       fetchIdentifiers() {
         let url = '/api/v1/identifier'
@@ -140,6 +148,12 @@
         }
         this.identifierType = this.identifierTypes[0];
       }
+    },
+    props: {
+      name: {
+        type: String,
+        default: 'identifier'
+      },
     },
     mounted() {
       this.fetchIdentifierTypes()
