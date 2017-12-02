@@ -23,6 +23,15 @@ class StorePerson extends FormRequest
      */
     public function authorize()
     {
+        if ($this->acacha_forms_disable_validation) {
+            if (Auth::user()->can('disable-validation')) return true;
+            return false;
+        }
+        if ($this->acacha_forms_disable_strict_validation) {
+            if (Auth::user()->can('disable-strict-validation')) return true;
+            return false;
+        }
+
         if (Auth::user()->can('store-person')) return true;
         return false;
     }
@@ -36,14 +45,11 @@ class StorePerson extends FormRequest
         'givenName' => 'required|string',
         'surname1' => 'required|string',
         'identifier' => 'required',
-        'identifier_type' => 'required',
-        'birthdate' => 'required|date',
-        // TODO birthdate have to be before now!
-//        'last_date' => 'required|date_format:"Y-m-d"|before:first_date',
-        'birthplace_id' => 'required|numeric',
+        'identifier_type' => 'required|exists:identifier_types,id',
+        'birthdate' => 'required|before:now',
+        'birthplace_id' => 'required|exists:locations,id',
         'gender' => 'required|in:male,female',
 //        'state' => 'sometimes|in:draft,valid,complete',
-
         // TODO:
         //$table->enum('civil_status',['Soltero/a','Casado/a','Separado/a','Divorciado/a','Viudo/a'])->nullable();
         //$table->enum('state',['draft','valid','completed'])->default('draft');
@@ -58,12 +64,5 @@ class StorePerson extends FormRequest
     protected $rules = [
         'givenName' => 'required|string',
         'surname1' => 'required|string',
-        'identifier' => 'required',
-        'identifier_type' => 'required',
-//        'surname2' => 'sometimes|required|string',
-//        'birthdate' => 'sometimes|required|date',
-//        'birthplace_id' => 'sometimes|required|date',
-//        'gender' => 'sometimes|in:male,female',
-//        'state' => 'sometimes|in:draft,valid,complete',
     ];
 }

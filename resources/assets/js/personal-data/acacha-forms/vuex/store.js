@@ -20,22 +20,37 @@ export default function(form) {
   return new Vuex.Store({
       state: {
         form: form,
-        loading: false,
-        action: CREATE_ACTION,
-        person_id: null
+        form_loading: false,
+        form_action: CREATE_ACTION,
+        form_resource_id: null
       },
       mutations: {
-        clearErrors(state, field) {
+        enableValidation(state) {
+          state.form.enableValidation()
+        },
+        disableValidation(state) {
+          state.form.disableValidation()
+        },
+        enableStrictValidation(state) {
+          state.form.enableStrictValidation()
+        },
+        disableStrictValidation(state) {
+          state.form.disableStrictValidation()
+        },
+        clearError(state, field) {
           state.form.errors.clear(field)
+        },
+        clearErrors(state) {
+          state.form.errors.clear()
         },
         resetForm(state) {
           state.form.reset()
         },
-        updateLoading(state, loading) {
-          state.loading = loading
+        updateLoading(state, form_loading) {
+          state.form_loading = form_loading
         },
-        updateAction(state, action) {
-          state.action = action
+        updateAction(state, form_action) {
+          state.form_action = form_action
         },
         updateFormField: assignValueTofield,
         updateForm (state, fields) {
@@ -49,8 +64,8 @@ export default function(form) {
         clearOnSubmit (state) {
           state.form.setClearOnSubmit()
         },
-        updatePersonId (state, personId) {
-          state.person_id = personId
+        updateResourceId (state, formResourceId) {
+          state.form_resource_id = formResourceId
         },
         onSuccess (state) {
           state.form.onSuccess()
@@ -63,24 +78,39 @@ export default function(form) {
         },
       },
       actions: {
-        updatePersonIdAction ({commit} , personId) {
-          commit('updatePersonId', personId)
+        enableValidationAction({commit}) {
+          commit('enableValidation')
+        },
+        disableValidationAction({commit}) {
+          commit('disableValidation')
+        },
+        enableStrictValidationAction({commit}) {
+          commit('enableStrictValidation')
+        },
+        disableStrictValidationAction({commit}) {
+          commit('disableStrictValidation')
+        },
+        clearErrorAction ({commit} , field) {
+          commit('clearError', field)
+        },
+        clearErrorsAction ({commit}) {
+          commit('clearErrors')
+        },
+        updateResourceIdAction ({commit} , formResourceId) {
+          commit('updateResourceId', formResourceId)
         },
         clearOnSubmitAction ({commit}) {
           commit('clearOnSubmit')
-        },
-        clearErrorsAction ({commit} , field) {
-          commit('clearErrors', field)
         },
         resetFormAction ({commit} ) {
           commit('resetForm')
           commit('updateAction',CREATE_ACTION)
         },
-        updateLoadingAction ({commit} ,loading) {
-          commit('updateLoading', loading)
+        updateLoadingAction ({commit} ,form_loading) {
+          commit('updateLoading', form_loading)
         },
-        updateActionAction ({commit} , action) {
-          commit('updateAction', action)
+        updateActionAction ({commit} , form_action) {
+          commit('updateAction', form_action)
         },
         updateFormFieldAction ({commit} ,field) {
           commit('updateFormField', field)

@@ -69,18 +69,16 @@
                     <i class="fa fa-refresh fa-spin"></i>
                 </div>
                 <div class="box-footer vertical-align-content">
-                    <button type="button" class="btn mr" @click="testFlash">Flash</button>
-
+                    <div>
+                        Validation: <toggle-button @change="toogleValidation" :value="validation" :sync="true" :labels="true" class="mr"></toggle-button>
+                    </div>
+                    <div v-if="validation">
+                        Strict: <toggle-button @change="toogleStrictValidation" :value="strictValidation" :sync="true" :labels="true" class="mr"></toggle-button>
+                    </div>
                     <button type="button" class="btn mr" @click="confirmClear" v-if="!clearing">Clear</button>
                     <div v-else class="mr">
                         Sure? <i class="fa fa-check green" @click="clear"></i> <i class="fa fa-remove red" @click="clearing = false;" ></i>
                     </div>
-                    <!--<div>-->
-                        <!--Validation: <toggle-button @change="toogleValidation" :value="validation" :sync="true" :labels="true" class="mr"></toggle-button>-->
-                    <!--</div>-->
-                    <!--<div v-if="validation">-->
-                        <!--Strict: <toggle-button @change="toogleStrictValidation" :value="strictValidation" :sync="true" :labels="true" class="mr"></toggle-button>-->
-                    <!--</div>-->
                     <button type="submit" class="btn btn-primary" :disabled="form.submitting || form.errors.any()">
                         <template v-if="form.submitting"><i class="fa fa-refresh fa-spin"></i></template>
                         {{ action }}
@@ -88,29 +86,6 @@
                 </div>
             </form>
         </div>
-
-        <h4>Form</h4>
-        <ul>
-            <li>Identifier: {{form.identifier}}</li>
-            <li>Identifier_id: {{form.identifier_id}}</li>
-            <li>Identifier_type: {{form.identifier_type}}</li>
-            <li>givenName: {{form.givenName}}</li>
-            <li>Surname 1: {{form.surname1}}</li>
-            <li>Surname 2: {{form.surname2}}</li>
-            <li>Gender: {{form.gender}}</li>
-            <li>Birthdate: {{form.birthdate}}</li>
-            <li>Birthplace id: {{form.birthplace_id}}</li>
-        </ul>
-        <h4>Store</h4>
-        <ul>
-            <li> Loading: {{ $store.state.loading }}</li>
-            <li> Action: {{ $store.state.action }}</li>
-            <li> Person_id: {{ $store.state.person_id }}</li>
-        </ul>
-        <h4>Errors</h4>
-        <ul>
-            <li v-for="error in form.errors"> {{ error }}</li>
-        </ul>
     </div>
 </template>
 
@@ -133,32 +108,19 @@
 
 <script>
 
-  import formStore from './acacha-forms/vuex/store'
-  import Form from './acacha-forms/vuex/Form'
+  const API_URI_ENDPOINT = '/api/v1/person'
+
   import ToggleButton from 'vue-js-toggle-button'
-  import Alert from './alert.js'
   Vue.use(ToggleButton)
+  import Alert from './alert.js'
+  import Flash from './flash.js'
+  import Validation from './validation.js'
 
   import {UPDATE_ACTION} from './acacha-forms/vuex/constants.js'
 
-  let initialForm = new Form({
-    identifier_id: '',
-    identifier: '',
-    identifier_type: 1,
-    person_id: '',
-    givenName: '',
-    surname1: '',
-    surname2: '',
-    birthdate: '',
-    birthplace_id: '',
-    gender: ''
-  })
-
-  let store = formStore(initialForm)
-
   export default {
-    store,
-    mixins: [Alert],
+    name:'PersonalDataSubForm',
+    mixins: [Alert, Flash, Validation],
     data () {
       return {
         clearing: false,
@@ -175,20 +137,20 @@
         return fullname.trim()
       },
       loading() {
-        return this.$store.state.loading
+        return this.$store.state.form_loading
       },
       form() {
         return this.$store.state.form
       },
       action() {
         if (this.form.submitting) {
-          if(this.$store.state.action === UPDATE_ACTION ) {
+          if(this.$store.state.form_action === UPDATE_ACTION ) {
             return 'Updating';
           } else {
             return 'Creating';
           }
         } else {
-          if(this.$store.state.action === UPDATE_ACTION ) {
+          if(this.$store.state.form_action === UPDATE_ACTION ) {
             return 'Update';
           } else {
             return 'Create';
@@ -197,22 +159,12 @@
       }
     },
     methods: {
-      testFlash() {
-        this.flash('Sergi Tur Badenas has been added to database','User created','success')
-      },
-      flash(message, title, color, icon) {
-        if (typeof window.flash === "function") {
-          window.flash(message, title, color, icon)
-        } else {
-          this.showAlert(message, title, color, icon)
-        }
-      },
       submit() {
         var component = this
-        let uri = '/api/v1/person'
+        let uri = API_URI_ENDPOINT
         let action = 'post'
-        if ( this.$store.state.action === UPDATE_ACTION) {
-          uri = '/api/v1/person/' + this.$store.state.person_id
+        if ( this.$store.state.form_action === UPDATE_ACTION) {
+          uri = API_URI_ENDPOINT + '/' + this.$store.state.form_resource_id
           action = 'put'
         }
         this.$store.dispatch(action,uri).then( response => {
@@ -238,16 +190,9 @@
         this.$store.dispatch('resetFormAction')
         this.clearing = false
       },
-      toogleValidation() {
-//        this.validation = !this.validation
-//        this.strictValidation= this.validation
-      },
-      toogleStrictValidation() {
-//        this.strictValidation = !this.strictValidation
-      },
       clearErrors (fieldName) {
         if ( !fieldName ) return
-        this.$store.dispatch('clearErrorsAction', fieldName)
+        this.$store.dispatch('clearErrorAction', fieldName)
       }
     },
     mounted() {

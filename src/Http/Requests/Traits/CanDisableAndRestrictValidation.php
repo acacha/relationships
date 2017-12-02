@@ -16,8 +16,8 @@ trait CanDisableAndRestrictValidation
      */
     public function rules()
     {
-        if ($this->disable_validation) return [];
-        elseif ($this->strict_validation) return $this->strictRules;
-        return $this->rules;
+        if ($this->acacha_forms_disable_validation) return [];
+        if ($this->acacha_forms_disable_strict_validation) return $this->rules;
+        return $this->strictRules;
     }
 }

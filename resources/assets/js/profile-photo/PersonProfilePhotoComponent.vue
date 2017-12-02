@@ -80,12 +80,9 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
-
                         </div>
                     </div>
-                    <!-- /.modal-content -->
                 </div>
-                <!-- /.modal-dialog -->
             </div>
         </div>
 </template>
@@ -128,7 +125,8 @@
     STATUS_REMOVING = 5, STATUS_REMOVE_FAILED = 6, STATUS_REMOVING_SUCCESS = 7, STATUS_LOADING_PHOTOS = 8,
     STATUS_LOADING_FAILED = 9;
 
-    export default {
+  export default {
+    name: 'PersonProfilePhoto',
     mixins: [
       fetchLoggedUser
     ],
@@ -145,7 +143,7 @@
     },
     props: {
       gender: {
-        validator: function (value) {
+        validator: value => {
           return ['male','female'].includes(value)
         },
         default: 'male'
@@ -157,6 +155,10 @@
       userId: {
         type: Number,
         default: null
+      },
+      loggedUser: {
+        type: Boolean,
+        default: true
       }
     },
     computed: {
@@ -194,12 +196,16 @@
     watch: {
       personId(newPersonId) {
         this.updatePhotoUrl(newPersonId)
+      },
+      id(newId) {
+        console.log('Prop id changed!')
+        this.personId = newId
       }
     },
     mounted() {
       this.reset()
       this.showDefaultPhoto()
-      this.setPersonIdValue()
+      if (this.loggedUser) this.setPersonIdValue()
     },
     methods: {
       updatePhotoUrl(personId) {
@@ -215,14 +221,13 @@
       },
       setPersonIdValue() {
         if ( ! this.personId ) {
-          var component = this
-          this.fetchLoggedUser().then(function (response) {
+          this.fetchLoggedUser().then( response => {
             let user = response.data
-            component.user = user.id
+            this.user = user.id
             if (user.person) {
-              component.personId = user.person.id
+              this.personId = user.person.id
             }
-          }).catch(function (error) {
+          }).catch( error => {
             console.log(error);
           });
         }
@@ -264,9 +269,8 @@
       preview() {
         if (this.$refs.photo.files && this.$refs.photo.files[0]) {
           var reader = new FileReader();
-          var component = this
-          reader.onload = function (e) {
-            component.$refs.photoImage.setAttribute('src', e.target.result);
+          reader.onload = e => {
+            this.$refs.photoImage.setAttribute('src', e.target.result);
           }
 
           reader.readAsDataURL(this.$refs.photo.files[0]);
@@ -275,9 +279,8 @@
       previewOnManagePhotos(index) {
         if (this.$refs.photoUpdate[index].files && this.$refs.photoUpdate[index].files[0]) {
           var reader = new FileReader();
-          var component = this
-          reader.onload = function (e) {
-            component.$refs.photoUpdateImage[index].setAttribute('src', e.target.result);
+          reader.onload = e => {
+            this.$refs.photoUpdateImage[index].setAttribute('src', e.target.result);
           }
           reader.readAsDataURL(this.$refs.photoUpdate[index].files[0]);
         }
@@ -293,21 +296,20 @@
         this.currentStatus = STATUS_SAVING
         let updatePhotoURL = '/api/v1/photos/' + photo.id
 
-        var component = this
         var config = {
-          onUploadProgress: function(progressEvent) {
+          onUploadProgress: progressEvent => {
             var percentCompleted = Math.round( (progressEvent.loaded * 100) / progressEvent.total )
           }
         }
         axios.post(updatePhotoURL, formData, config)
-          .then(function (res) {
-            component.currentStatus = STATUS_SUCCESS
+          .then( res => {
+            this.currentStatus = STATUS_SUCCESS
             //Update vue component state
-            component.updatePhotoStateFromJsonResponse(photo, res.data)
+            this.updatePhotoStateFromJsonResponse(photo, res.data)
           })
-          .catch(function (error) {
+          .catch( error=> {
             console.log(error)
-            component.currentStatus = STATUS_FAILED
+            this.currentStatus = STATUS_FAILED
           })
       },
       save(formData) {
@@ -315,22 +317,21 @@
         let uploadPhotoURL = '/api/v1/user/' + this.user + '/photo'
         if ( this.personId ) uploadPhotoURL = '/api/v1/person/' + this.personId + '/photo'
 
-        var component = this
         var config = {
-          onUploadProgress: function(progressEvent) {
+          onUploadProgress: progressEvent => {
             var percentCompleted = Math.round( (progressEvent.loaded * 100) / progressEvent.total )
           }
         }
 
         axios.post(uploadPhotoURL, formData, config)
-          .then(function (res) {
-            component.currentStatus = STATUS_SUCCESS
+          .then( response => {
+            this.currentStatus = STATUS_SUCCESS
             // If person_id is null update after succesfully adding a photo
-            component.personId = res.data.person_id
+            this.personId = response.data.person_id
           })
-          .catch(function (error) {
+          .catch( error => {
             console.log(error)
-            component.currentStatus = STATUS_FAILED
+            this.currentStatus = STATUS_FAILED
           })
       },
       reset() {
@@ -343,30 +344,27 @@
         this.currentStatus = STATUS_REMOVING
         let deletePhotoURL = '/api/v1/user/' + this.user + '/photo'
         if ( this.personId ) deletePhotoURL = '/api/v1/person/' + this.personId + '/photo'
-        let component = this
         axios.delete(deletePhotoURL)
-          .then(function (res) {
-            component.currentStatus = STATUS_REMOVING_SUCCESS
-            component.updatePhotoUrl(component.personId)
+          .then( response => {
+            this.currentStatus = STATUS_REMOVING_SUCCESS
+            this.updatePhotoUrl(this.personId)
           })
-          .catch(function (error) {
+          .catch( error => {
             console.log(error)
-            component.currentStatus = STATUS_REMOVE_FAILED
+            this.currentStatus = STATUS_REMOVE_FAILED
           })
       },
       manage() {
         this.currentStatus = STATUS_LOADING_PHOTOS
         let showPhotosURL = '/api/v1/user/' + this.user + '/photos'
         if ( this.personId ) showPhotosURL = '/api/v1/person/' + this.personId + '/photos'
-        let component = this
         axios.get(showPhotosURL)
-          .then(function (res) {
-              component.photos = res.data
-              component.currentStatus = STATUS_INITIAL
-            }).catch(
-          function (error) {
+          .then( response => {
+              this.photos = response.data
+            this.currentStatus = STATUS_INITIAL
+            }).catch( error => {
             console.log(error)
-            component.currentStatus = STATUS_LOADING_FAILED
+            this.currentStatus = STATUS_LOADING_FAILED
           }
         ).then()
       },
@@ -377,19 +375,17 @@
         this.photoBeingRemoved = photo.id
         this.photoBeingConfirmed = null
         let removePhotoURL = '/api/v1/photos/' + photo.id
-        let component = this
         axios.delete(removePhotoURL)
-          .then(function (res) {
-          component.photos.splice(component.photos.indexOf(photo), 1)
-          component.currentStatus = STATUS_INITIAL
-            if (index === 0 ) component.updatePhotoUrl(component.personId)
-        }).catch(
-          function (error) {
+          .then( res => {
+          this.photos.splice(this.photos.indexOf(photo), 1)
+          this.currentStatus = STATUS_INITIAL
+            if (index === 0 ) this.updatePhotoUrl(this.personId)
+        }).catch( error => {
             console.log(error)
-            component.currentStatus = STATUS_REMOVING_FAILED
+            this.currentStatus = STATUS_REMOVING_FAILED
           }
-        ).then(function() {
-          component.photoBeingRemoved = null
+        ).then( () => {
+          this.photoBeingRemoved = null
         })
       },
     }

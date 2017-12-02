@@ -5,7 +5,10 @@ Vue.use(Vuex)
 
 // Register components
 Vue.component('person-profile-photo', require('./profile-photo/PersonProfilePhotoComponent.vue'));
+Vue.component('person-profile-photo-form', require('./personal-data/PersonProfilePhotoFormComponent.vue'));
 Vue.component('personal-data-subform', require('./personal-data/PersonalDataSubFormComponent.vue'));
+Vue.component('personal-data-form', require('./personal-data/PersonalDataFormComponent.vue'));
+Vue.component('form-debug-info', require('./personal-data/acacha-forms/FormDebubgInfoComponent.vue'));
 
 //Adminlte
 Vue.component('adminlte-input-text',        require('./personal-data/adminlte/AdminlteInputTextComponent.vue'));

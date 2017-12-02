@@ -166,7 +166,7 @@ class PersonTest extends TestCase
     public function create_person_without_identifier()
     {
         $person = create_person();
-        $person= array_merge($person, [ 'disable_validation' => true]);
+        $person= array_merge($person, [ 'acacha_forms_disable_strict_validation' => true]);
 
         $this->signInAsRelationshipsManager('api');
 

@@ -46,7 +46,17 @@ if (! function_exists('initialize_relationships_management_permissions')) {
      */
     function initialize_relationships_management_permissions()
     {
+        $superAdmin = role_first_or_create('super-admin-manage-relationships');
+
+        //Disable validation
+        permission_first_or_create('disable-validation');
+        give_permission_to_role($superAdmin,'disable-validation');
+
         $manageRelationships = role_first_or_create('manage-relationships');
+
+        //Disable strict validation
+        permission_first_or_create('disable-strict-validation');
+        give_permission_to_role($manageRelationships,'disable-strict-validation');
 
         //Relationships MANAGEMENT
         permission_first_or_create('search-by-identifier');

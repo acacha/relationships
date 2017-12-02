@@ -12,7 +12,6 @@ use Illuminate\Database\Eloquent\Factory as EloquentFactory;
  *
  * @package Acacha\Relationships\Providers
  */
-
 class RelationshipsProvider extends ServiceProvider
 {
     /**
@@ -52,15 +51,39 @@ class RelationshipsProvider extends ServiceProvider
         $this->registerEloquentFactoriesFrom(RELATIONSHIPS_PATH . '/database/factories');
     }
 
+    /**
+     * Define routes
+     */
     protected function defineRoutes()
     {
         if (!$this->app->routesAreCached()) {
             $router = app('router');
 
-            $router->group(['namespace' => 'Acacha\Relationships\Http\Controllers'], function () {
-                require __DIR__.'/../Http/routes.php';
-            });
+            $this->defineWebRoutes($router);
+            $this->defineApiRoutes($router);
         }
+    }
+
+    /**
+     * Define web routes.
+     *
+     * @param $router
+     */
+    protected function defineWebRoutes($router)
+    {
+        $router->group(['namespace' => 'Acacha\Relationships\Http\Controllers'], function () {
+            require RELATIONSHIPS_PATH . '/routes/web.php';
+        });
+    }
+
+    /**
+     * Define api routes.
+     */
+    protected function defineApiRoutes($router)
+    {
+        $router->group(['namespace' => 'Acacha\Relationships\Http\Controllers'], function () {
+            require RELATIONSHIPS_PATH . '/routes/api.php';
+        });
     }
 
     /**
