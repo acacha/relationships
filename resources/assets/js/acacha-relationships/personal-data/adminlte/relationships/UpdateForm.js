@@ -1,6 +1,6 @@
 export default {
   methods: {
-    updateForm(person) {
+    updateForm (person) {
       const fields = [
         {
           field: 'identifier',
@@ -39,7 +39,7 @@ export default {
           value: person.gender || ''
         }
       ]
-      this.$store.dispatch('updateFormAction', fields)
+      this.$store.dispatch('acacha-forms/updateFormAction', fields)
     }
   }
 }

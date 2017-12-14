@@ -17,7 +17,6 @@
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
 
 <script>
-
   import Multiselect from 'vue-multiselect'
   import axios from 'axios'
   import FetchPerson from './FetchPerson'
@@ -35,58 +34,58 @@
       }
     },
     computed: {
-      fullname() {
+      fullname () {
         if (this.fullNameString === '') return null
         let fullNameFound = this.fullnameObject()
         if (fullNameFound) return fullNameFound
         return this.addNewFullName()
       },
-      fullNameString() {
-        let fullname =  this.$store.state.form.givenName + ' ' + this.$store.state.form.surname1 + ' ' +this.$store.state.form.surname2
+      fullNameString () {
+        let fullname = this.$store.state['acacha-forms'].form.givenName + ' ' + this.$store.state['acacha-forms'].form.surname1 + ' ' + this.$store.state['acacha-forms'].form.surname2
         return fullname.trim()
-      },
+      }
     },
     methods: {
-      fullnameObject() {
+      fullnameObject () {
         return this.fullnames.find((fullname) => {
           return fullname.name === this.fullNameString
         })
       },
-      addNewFullName() {
+      addNewFullName () {
         const fullname = {
           id: -1,
-          identifier: this.$store.state.form.identifier,
-          identifier_id: this.$store.state.form.identifier_id ? this.$store.state.form.identifier : -1,
+          identifier: this.$store.state['acacha-forms'].form.identifier,
+          identifier_id: this.$store.state['acacha-forms'].form.identifier_id ? this.$store.state['acacha-forms'].form.identifier : -1,
           name: this.fullNameString
         }
-        if (this.fullnames[0]) if ( this.fullnames[0].id === -1 ) this.fullnames.shift()
-        this.fullnames.splice(0,0, fullname)
+        if (this.fullnames[0]) if (this.fullnames[0].id === -1) this.fullnames.shift()
+        this.fullnames.splice(0, 0, fullname)
         return fullname
       },
-      customLabel({ name, identifier}) {
-        return identifier !==-1 && identifier !== '' ? `${name} - ${identifier}` : `${name}`
+      customLabel ({ name, identifier }) {
+        return identifier !== -1 && identifier !== '' ? `${name} - ${identifier}` : `${name}`
       },
-      updateFullname(fullname) {
+      updateFullname (fullname) {
         if (fullname) {
-          if (fullname.id !== -1) // -1 New identifier -> no person associated -> avoid search
+          if (fullname.id !== -1) { // -1 New identifier -> no person associated -> avoid search
             this.fetchPersonAndUpdateForm(fullname.id)
+          }
         }
       },
-      fetchFullnames() {
+      fetchFullnames () {
         const url = '/api/v1/fullname'
         this.loading = true
-        axios.get(url).then( (response) => {
+        axios.get(url).then((response) => {
           this.fullnames = response.data
-        }).catch( (error) => {
+        }).catch((error) => {
           console.log(error)
-        }).then( () => {
+        }).then(() => {
           this.loading = false
         })
-      },
+      }
     },
-    mounted() {
+    mounted () {
       this.fetchFullnames()
     }
   }
-
 </script>

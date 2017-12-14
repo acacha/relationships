@@ -1,7 +1,7 @@
 <template>
-    <div class="form-group has-feedback" :class="{ 'has-error': internalForm.errors.has(name) }">
+    <div class="form-group has-feedback" :class="{ 'has-error': hasError() }">
         <transition name="fade">
-            <label key="error" class="help-block" v-if="internalForm.errors.has(name)" v-text="internalForm.errors.get(name)"></label>
+            <label key="error" class="help-block" v-if="hasError()" v-text="error()"></label>
             <slot name="label" v-else>
                 <label key="regular" :for="id">{{placeholder}}</label>
             </slot>
@@ -27,17 +27,16 @@
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
 
 <script>
-
-  import formWidget from '../FormWidget'
+  import { FormComponent } from 'acacha-adminlte-vue-forms'
   import Multiselect from 'vue-multiselect'
 
   const genders = [
     {
-      label : 'Male',
+      label: 'Male',
       value: 'male'
     },
     {
-      label : 'Female',
+      label: 'Female',
       value: 'female'
     }
   ]
@@ -45,20 +44,20 @@
   export default {
     name: 'AdminLTEInputGender',
     components: { Multiselect },
-    mixins: [ formWidget ],
+    mixins: [ FormComponent ],
     data () {
       return {
-        genders: genders,
+        genders: genders
       }
     },
     props: {
       name: {
         type: String,
-        default: "gender"
+        default: 'gender'
       },
       placeholder: {
         type: String,
-        default: "Select gender"
+        default: 'Select gender'
       }
     },
     computed: {
@@ -67,14 +66,20 @@
       }
     },
     methods: {
-      customLabel({ label }) {
+      customLabel ({ label }) {
         return `${label}`
       },
-      updateGender(gender) {
-        this.updateFormField(gender ? gender.value : '')
+      updateGender (gender) {
+        let genderValue = gender ? gender.value : ''
+        this.updateFormField(genderValue)
+        genderValue && this.clearError()
       },
-      genderObject() {
-        return this.genders.find( gender => {
+      clearError () {
+        console.log(this.name)
+        this.$store.dispatch('acacha-forms/clearErrorAction', this.name)
+      },
+      genderObject () {
+        return this.genders.find(gender => {
           return gender.value === this.internalForm[this.name]
         })
       }

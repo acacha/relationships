@@ -1,18 +1,26 @@
 import AdminlteVue from 'adminlte-vue'
 import Vue from 'vue'
 import { config } from './config/relationships'
+import PersonProfilePhotoComponent from './profile-photo/PersonProfilePhotoComponent.vue'
+import PersonProfilePhotoFormComponent from './personal-data/PersonProfilePhotoFormComponent.vue'
+import PersonalDataSubFormComponent from './personal-data/PersonalDataSubFormComponent.vue'
+import PersonalDataFormComponent from './personal-data/PersonalDataFormComponent.vue'
+import FormDebugInfoComponent from './personal-data/acacha-forms/FormDebugInfoComponent.vue'
+import AdminlteInputGenderComponent from './personal-data/adminlte/relationships/AdminlteInputGenderComponent.vue'
+import AdminlteInputFullnamesComponent from './personal-data/adminlte/relationships/AdminlteInputFullnamesComponent.vue'
+import AdminlteInputIdentifiersComponent from './personal-data/adminlte/relationships/AdminlteInputIdentifiersComponent.vue'
 
 // Register components
-Vue.component('person-profile-photo', require('./profile-photo/PersonProfilePhotoComponent.vue'));
-Vue.component('person-profile-photo-form', require('./personal-data/PersonProfilePhotoFormComponent.vue'));
-Vue.component('personal-data-subform', require('./personal-data/PersonalDataSubFormComponent.vue'));
-Vue.component('personal-data-form', require('./personal-data/PersonalDataFormComponent.vue'));
-Vue.component('form-debug-info', require('./personal-data/acacha-forms/FormDebubgInfoComponent.vue'));
+Vue.component('person-profile-photo', PersonProfilePhotoComponent)
+Vue.component('person-profile-photo-form', PersonProfilePhotoFormComponent)
+Vue.component('personal-data-subform', PersonalDataSubFormComponent)
+Vue.component('personal-data-form', PersonalDataFormComponent)
+Vue.component('form-debug-info', FormDebugInfoComponent)
 
 // Adminlte
-// Vue.component('adminlte-input-gender',      require('./personal-data/adminlte/relationships/AdminlteInputGenderComponent.vue'));
-// Vue.component('adminlte-input-fullnames',   require('./personal-data/adminlte/relationships/AdminlteInputFullnamesComponent.vue'));
-// Vue.component('adminlte-input-identifiers', require('./personal-data/adminlte/relationships/AdminlteInputIdentifiersComponent.vue'));
+Vue.component('adminlte-input-gender', AdminlteInputGenderComponent)
+Vue.component('adminlte-input-fullnames', AdminlteInputFullnamesComponent)
+Vue.component('adminlte-input-identifiers', AdminlteInputIdentifiersComponent)
 
 Vue.use(AdminlteVue)
 

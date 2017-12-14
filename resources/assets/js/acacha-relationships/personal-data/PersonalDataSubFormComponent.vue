@@ -20,29 +20,38 @@
                 <div class="box-body">
                     <div class="row">
                         <div class="col-md-5">
+                            <adminlte-input-identifiers></adminlte-input-identifiers>
                         </div>
                         <div class="col-md-7">
+                            <adminlte-input-fullnames></adminlte-input-fullnames>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-4">
-                            <adminlte-input-text name="givenName" :form="form"></adminlte-input-text>
+                            <adminlte-input-text name="givenName"></adminlte-input-text>
                         </div>
                         <div class="col-md-3">
+                            <adminlte-input-text name="surname1"></adminlte-input-text>
                         </div>
                         <div class="col-md-3">
+                            <adminlte-input-text name="surname2"></adminlte-input-text>
                         </div>
                         <div class="col-md-2">
-
+                            <adminlte-input-gender>
+                                <label slot="label">Gender</label>
+                            </adminlte-input-gender>
                         </div>
                     </div>
                     <div class="row">
 
                         <div class="col-md-4">
-
+                            <adminlte-input-location name="birthplace_id" placeholder="Select birthplace">
+                                <label slot="label">Birth place</label>
+                            </adminlte-input-location>
                         </div>
 
                         <div class="col-md-4">
+                            <adminlte-input-date-mask name="birthdate"></adminlte-input-date-mask>
                         </div>
 
                         <div class="col-md-4">
@@ -104,31 +113,46 @@
 <script>
   import ToggleButton from 'vue-js-toggle-button'
   import {FlashMixin, AlertMixin} from 'adminlte-vue'
-  import Validation from './validation.js'
-  // TODO agafar del paquet original acacha-forms!!!!!!!!
-  import {UPDATE_ACTION} from './acacha-forms/vuex/constants.js'
   import { mapGetters } from 'vuex'
-  import { AdminlteInputTextComponent } from 'acacha-adminlte-vue-forms'
+  import { AdminlteInputTextComponent, AdminlteInputDateMaskComponent, AdminlteInputLocationComponent } from 'acacha-adminlte-vue-forms'
   import Vue from 'vue'
-  import Form, { FormsModule } from 'acacha-forms'
+  import Form, { FormsModule, UPDATE_ACTION, ValidationMixin, ClearMixin, ClearErrorsMixin, LoadingMixin } from 'acacha-forms'
+  import AdminlteInputFullnamesComponent from './adminlte/relationships/AdminlteInputFullnamesComponent.vue'
+  import AdminlteInputGenderComponent from './adminlte/relationships/AdminlteInputGenderComponent.vue'
+  import AdminlteInputIdentifiersComponent from './adminlte/relationships/AdminlteInputIdentifiersComponent.vue'
 
   const API_URI_ENDPOINT = '/api/v1/person'
 
   Vue.use(ToggleButton)
 
   const initialForm = new Form({
-    givenName: ''
+    identifier_id: '',
+    identifier: '',
+    identifier_type: 1,
+    person_id: '',
+    givenName: '',
+    surname1: '',
+    surname2: '',
+    birthdate: '',
+    birthplace_id: '',
+    gender: ''
   })
 
   const AcachaForm = FormsModule(initialForm)
 
   export default {
     name: 'PersonalDataSubForm',
-    components: { AdminlteInputTextComponent },
-    mixins: [FlashMixin, AlertMixin, Validation],
+    components: {
+      AdminlteInputTextComponent,
+      AdminlteInputDateMaskComponent,
+      AdminlteInputLocationComponent,
+      AdminlteInputFullnamesComponent,
+      AdminlteInputGenderComponent,
+      AdminlteInputIdentifiersComponent
+    },
+    mixins: [FlashMixin, AlertMixin, ValidationMixin, ClearMixin, ClearErrorsMixin, LoadingMixin],
     data () {
       return {
-        clearing: false,
         lastStatusCode: null,
         lastStatusText: null,
         lastCreatedUser: null,
@@ -141,18 +165,15 @@
         let fullname = this.lastCreatedUser.givenName + ' ' + this.lastCreatedUser.surname1 + ' ' + this.lastCreatedUser.surname2
         return fullname.trim()
       },
-      loading () {
-        return this.$store.state.form_loading
-      },
       action () {
         if (this.form.submitting) {
-          if (this.$store.state.form_action === UPDATE_ACTION) {
+          if (this.$store.state['acacha-forms'].action === UPDATE_ACTION) {
             return 'Updating'
           } else {
             return 'Creating'
           }
         } else {
-          if (this.$store.state.form_action === UPDATE_ACTION) {
+          if (this.$store.state['acacha-forms'].action === UPDATE_ACTION) {
             return 'Update'
           } else {
             return 'Create'
@@ -167,8 +188,8 @@
       submit () {
         let uri = API_URI_ENDPOINT
         let action = 'acacha-forms/post'
-        if (this.$store.state.form_action === UPDATE_ACTION) {
-          uri = API_URI_ENDPOINT + '/' + this.$store.state.form_resource_id
+        if (this.$store.state['acacha-forms'].action === UPDATE_ACTION) {
+          uri = API_URI_ENDPOINT + '/' + this.$store.state['acacha-forms'].resource_id
           action = 'acacha-forms/put'
         }
         this.$store.dispatch(action, uri).then(response => {
@@ -176,27 +197,16 @@
           this.lastStatusText = response.statusText
           this.lastCreatedUser = response.data
           this.message = 'User created ok!'
-          if (action === 'put') this.message = 'User modified ok!'
+          if (action === 'acacha-forms/put') this.message = 'User modified ok!'
           let actionPart = 'added'
-          if (action === 'put') actionPart = 'modified'
+          if (action === 'acacha-forms/put') actionPart = 'modified'
           let color = 'success'
-          if (action === 'put') color = 'warning'
+          if (action === 'acacha-forms/put') color = 'warning'
           this.flash(this.lastCreatedUserFullName + ' has been ' + actionPart + ' to database', this.message, color)
         }).catch(error => {
           if (error.response.status === 422) return
           this.flash('' + error, 'Oooppssss something went wrong!', 'danger', 'ban')
         })
-      },
-      confirmClear () {
-        this.clearing = true
-      },
-      clear () {
-        this.$store.dispatch('acacha-forms/resetFormAction')
-        this.clearing = false
-      },
-      clearErrors (fieldName) {
-        if (!fieldName) return
-        this.$store.dispatch('acacha-forms/clearErrorAction', fieldName)
       }
     },
     created () {

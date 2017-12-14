@@ -38,88 +38,88 @@
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
 
 <script>
-
   import Multiselect from 'vue-multiselect'
   import axios from 'axios'
   import FetchPerson from './FetchPerson'
   import FetchPersonUpdateForm from './FetchPersonUpdateForm'
   import UpdateForm from './UpdateForm'
-  import FormWidget from '../FormWidget'
+  import { FormComponent } from 'acacha-adminlte-vue-forms'
 
   export default {
     name: 'AdminlteInputIdentifiersComponent',
     components: {Multiselect},
-    mixins: [ FormWidget, FetchPerson, FetchPersonUpdateForm, UpdateForm ],
+    mixins: [ FormComponent, FetchPerson, FetchPersonUpdateForm, UpdateForm ],
     data () {
       return {
         loading: false,
         identifiers: [],
-        identifierTypes: [],
+        identifierTypes: []
       }
     },
     computed: {
-      identifierTypeName() {
+      identifierTypeName () {
         return this.identifier_type ? this.identifier_type.name : ''
       },
-      identifier() {
+      identifier () {
         return this.identifierObject()
       },
-      identifier_type() {
+      identifier_type () {
         return this.identifierTypeObject()
       }
     },
     methods: {
-      identifierObject() {
+      identifierObject () {
         return this.identifiers.find((identifier) => {
-          return identifier.id == this.$store.state.form.identifier_id
+          return identifier.id == this.$store.state['acacha-forms'].form.identifier_id // eslint-disable-line
         })
       },
-      identifierTypeObject() {
+      identifierTypeObject () {
         return this.identifierTypes.find((identifierType) => {
-          return identifierType.id == this.$store.state.form.identifier_type
+          return identifierType.id == this.$store.state['acacha-forms'].form.identifier_type // eslint-disable-line
         })
       },
-      customLabel({ value, type_name}) {
-        return `${value} - ${type_name}`
+      customLabel ({ value, type_name }) { // eslint-disable-line
+        return `${value} - ${type_name}`   // eslint-disable-line
       },
-      updateIdentifier(identifier) {
+      updateIdentifier (identifier) {
         if (identifier) {
-          this.$store.dispatch('clearErrorsAction', this.name)
-          if (identifier.id !== -1) // -1 New identifier -> no person associated -> avoid search
+          this.$store.dispatch('acacha-forms/clearErrorsAction', this.name)
+          if (identifier.id !== -1) { // -1 New identifier -> no person associated -> avoid search
             this.fetchPersonAndUpdateForm(identifier.person_id)
+          }
         }
       },
-      addIdentifier(newIdentifier) {
+      addIdentifier (newIdentifier) {
         const identifier = {
-          id : -1,
+          id: -1,
           person_id: -1,
           type_id: this.identifier_type.id,
           type_name: this.identifier_type.name,
           value: newIdentifier
         }
-        if ( this.identifiers[0].id === -1 ){
+        if (this.identifiers[0].id === -1) {
           this.identifiers.shift()
         }
-        this.identifiers.splice(0,0,identifier)
-        this.$store.dispatch('updateFormFieldAction', {
-          field : 'identifier',
-          value : newIdentifier
+        this.identifiers.splice(0, 0, identifier)
+        this.$store.dispatch('acacha-forms/updateFormFieldAction', {
+          field: 'identifier',
+          value: newIdentifier
         })
-        this.$store.dispatch('updateFormFieldAction', {
-          field : 'identifier_id',
-          value : -1
+        this.$store.dispatch('acacha-forms/updateFormFieldAction', {
+          field: 'identifier_id',
+          value: -1
         })
-        this.$store.dispatch('clearErrorsAction', this.name)
+        this.$store.dispatch('acacha-forms/clearErrorsAction', this.name)
         this.$emit('tag', identifier)
       },
-      updateIdentifierType(identifierType) {
+      updateIdentifierType (identifierType) {
         let id = identifierType ? identifierType.id : ''
-        this.$store.dispatch('updateFormFieldAction', {
-          field : 'identifier_type',
-          value : id
-        });
+        this.$store.dispatch('acacha-forms/updateFormFieldAction', {
+          field: 'identifier_type',
+          value: id
+        })
       },
-      fetchIdentifiers() {
+      fetchIdentifiers () {
         let url = '/api/v1/identifier'
         axios.get(url).then((response) => {
           this.identifiers = response.data
@@ -127,7 +127,7 @@
           console.log(error)
         })
       },
-      fetchIdentifierTypes() {
+      fetchIdentifierTypes () {
         let url = '/api/v1/identifierType'
         this.loading = true
         axios.get(url).then((response) => {
@@ -139,23 +139,23 @@
           this.loading = false
         })
       },
-      setDefaultSelectedIdentifierType() {
-        if ( this.selected ) {
+      setDefaultSelectedIdentifierType () {
+        if (this.selected) {
           this.identifierType = this.identifierTypes.find((identifierType) => {
             return identifierType.name === this.selected
           })
-        if (this.identifierType !== undefined) return
+          if (this.identifierType !== undefined) return
         }
-        this.identifierType = this.identifierTypes[0];
+        this.identifierType = this.identifierTypes[0]
       }
     },
     props: {
       name: {
         type: String,
         default: 'identifier'
-      },
+      }
     },
-    mounted() {
+    mounted () {
       this.fetchIdentifierTypes()
       this.fetchIdentifiers()
     }

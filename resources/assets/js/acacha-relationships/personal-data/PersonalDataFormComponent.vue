@@ -149,7 +149,6 @@
 </template>
 
 <script>
-
   import formStore from './acacha-forms/vuex/store'
   import Form from './acacha-forms/vuex/Form'
 
@@ -166,7 +165,7 @@
     surname2: '',
     birthdate: '',
     birthplace_id: '',
-    gender: '',
+    gender: ''
   })
 
   let store = formStore(initialForm)
