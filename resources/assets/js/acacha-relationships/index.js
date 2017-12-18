@@ -9,6 +9,8 @@ import FormDebugInfoComponent from './personal-data/acacha-forms/FormDebugInfoCo
 import AdminlteInputGenderComponent from './personal-data/adminlte/relationships/AdminlteInputGenderComponent.vue'
 import AdminlteInputFullnamesComponent from './personal-data/adminlte/relationships/AdminlteInputFullnamesComponent.vue'
 import AdminlteInputIdentifiersComponent from './personal-data/adminlte/relationships/AdminlteInputIdentifiersComponent.vue'
+import UserProfile from './users/user-profile/UserProfileComponent.vue'
+
 
 // Register components
 Vue.component('person-profile-photo', PersonProfilePhotoComponent)
@@ -23,6 +25,9 @@ Vue.component('adminlte-input-fullnames', AdminlteInputFullnamesComponent)
 Vue.component('adminlte-input-identifiers', AdminlteInputIdentifiersComponent)
 
 Vue.use(AdminlteVue)
+
+// Profile
+Vue.component('user-profile', UserProfile)
 
 window.acacha_relationships = {}
 window.acacha_relationships.config = config

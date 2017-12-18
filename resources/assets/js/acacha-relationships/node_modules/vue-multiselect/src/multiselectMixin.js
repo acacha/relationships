@@ -326,9 +326,9 @@ export default {
       /* istanbul ignore else */
       if (this.taggable && normalizedSearch.length && !this.isExistingOption(normalizedSearch)) {
         if (this.tagPosition === 'bottom') {
-          options.push({ isTag: true, label: normalizedSearch })
+          options.push({ isTag: true, label: search })
         } else {
-          options.unshift({ isTag: true, label: normalizedSearch })
+          options.unshift({ isTag: true, label: search })
         }
       }
 
@@ -625,16 +625,6 @@ export default {
         this.prefferedOpenDirection = 'above'
         this.optimizedHeight = Math.min(spaceAbove - 40, this.maxHeight)
       }
-    },
-    /**
-     * Handles the touchstart stop propagation.
-     * Selects an option on mobile devices with one click
-     * @param index
-     * @param option
-     */
-    handleTouchStartStop (index, option) {
-      this.pointerSet(index)
-      this.select(option)
     }
   }
 }
