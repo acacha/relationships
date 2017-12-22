@@ -7,7 +7,6 @@ use Acacha\Relationships\Http\Requests\UpdatePerson;
 use Acacha\Relationships\Models\Identifier;
 use Acacha\Relationships\Models\Person;
 use Acacha\Relationships\Http\Requests\StorePerson;
-use Illuminate\Http\Request;
 
 /**
  * Class PersonController.

@@ -75,8 +75,7 @@
         genderValue && this.clearError()
       },
       clearError () {
-        console.log(this.name)
-        this.$store.dispatch('acacha-forms/clearErrorAction', this.name)
+        this.$store.dispatch(this.action('clearErrorAction'), this.name)
       },
       genderObject () {
         return this.genders.find(gender => {

@@ -24,6 +24,7 @@
         "maatwebsite/excel": "~2.1.0",
         "pragmarx/countries": "^0.1.1",
         "scool/ebre_escool_model": "dev-master",
+        "spatie/eloquent-sortable": "^3.4",
         "spatie/laravel-permission": "^2.6"
     },
     "require-dev": {

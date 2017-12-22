@@ -2,19 +2,23 @@
 
 namespace Acacha\Relationships\Models;
 
+use Acacha\Relationships\Models\Traits\HasMorphedPersons;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Class ContactType.
+ * Class Phone.
  *
  * @package Acacha\Relationships\Models
  */
-class ContactType extends Model
+class Phone extends Model
 {
+    use HasMorphedPersons;
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = ['name'];
+    protected $fillable = ['value'];
+
 }

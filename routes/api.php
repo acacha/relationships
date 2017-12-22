@@ -39,6 +39,18 @@ Route::group(['middleware' => 'api','prefix' => 'api/v1', 'middleware' => ['thro
         //Locations
         Route::get('/location',                 'LocationController@index');
 
+        //Logged user person
+        Route::get('/user/person',              'LoggedUserPersonController@show');
+        Route::post('/user/person',             'LoggedUserPersonController@store');
+        Route::put('/user/person',              'LoggedUserPersonController@update');
+
+        //Logged user person emails
+        Route::get('/user/person/emails',           'LoggedUserPersonEmailsController@index');
+        Route::post('/user/person/email',           'LoggedUserPersonEmailsController@store');
+        Route::put('/user/person/email/{mail}',    'LoggedUserPersonEmailsController@update');
+        Route::delete('/user/person/email/{mail}', 'LoggedUserPersonEmailsController@destroy');
+
+//        $response = $this->delete('api/v1/user/person/email/' . $email2->id );
 
     });
 

@@ -16,24 +16,13 @@ class CreateContactsTable extends Migration
      */
     public function up()
     {
-        Schema::create('contacts', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('value');
-            $table->integer('contact_type_id')->unsigned();
-            $table->unique(['value', 'contact_type_id']);
-            $table->timestamps();
-        });
-
-        Schema::create('contact_person', function (Blueprint $table) {
-            $table->increments('id');
+        Schema::create('contactables', function (Blueprint $table) {
             $table->integer('person_id')->unsigned();
-            $table->integer('contact_id')->unsigned();
-            $table->tinyInteger('order');
+            $table->morphs('contactable');
+            $table->integer('position')->nullable();
 
-            $table->unique(['person_id', 'contact_id']);
-
+            $table->unique(['person_id', 'contactable_id', 'contactable_type']);
             $table->foreign('person_id')->references('id')->on('people')->onDelete('cascade');
-            $table->foreign('contact_id')->references('id')->on('contacts')->onDelete('cascade');
 
             $table->timestamps();
         });
@@ -46,7 +35,6 @@ class CreateContactsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('contact_person');
-        Schema::dropIfExists('contacts');
+        Schema::dropIfExists('contactables_people');
     }
 }

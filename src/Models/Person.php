@@ -196,11 +196,27 @@ class Person extends Model implements Stateful
     }
 
     /**
-     * The contacts that belong to the person.
+     * The emails that belong to the person.
      */
-    public function contacts()
+    public function emails()
     {
-        return $this->belongsToMany(Contact::class)->withTimestamps();
+        return $this->morphedByMany(Email::class, 'contactable')->withTimestamps()->withPivot('position');
+    }
+
+    /**
+     * The phones that belong to the person.
+     */
+    public function phones()
+    {
+        return $this->morphToMany(Phone::class, 'contactable')->withTimestamps();
+    }
+
+    /**
+     * The mobiles that belong to the person.
+     */
+    public function mobiles()
+    {
+        return $this->morphToMany(Mobile::class, 'contactable')->withTimestamps();
     }
 
     /**

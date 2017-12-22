@@ -1,10 +1,6 @@
 <template>
     <div>
-        <div :class="'alert alert-' + alertColor + ' flash-message ' + alertDismissibleClass" v-if="alertVisible && alertMessage !=''">
-            <button @click="hide" v-if="alertDismissible" type="button" class="close" alert-dismiss="alert" aria-hidden="true">×</button>
-            <h4 v-if="alertTitle"><i :class="'icon fa fa-' + alertIcon"></i> {{ alertTitle }}</h4>
-            {{ alertMessage }}
-        </div>
+        <adminlte-alert :alert="alert"></adminlte-alert>
         <div class="box box-primary">
             <form method="post" @submit.prevent="submit" @keydown="clearErrors($event.target.name)">
                 <div class="box-header with-border">
@@ -84,12 +80,6 @@
                 </div>
             </form>
         </div>
-        <div>
-            <h3>Form:</h3>
-            {{ form }}
-            <h3>Errors:</h3>
-            {{ form.errors }}
-        </div>
     </div>
 </template>
 
@@ -112,7 +102,7 @@
 
 <script>
   import ToggleButton from 'vue-js-toggle-button'
-  import {FlashMixin, AlertMixin} from 'adminlte-vue'
+  import {FlashMixin} from 'adminlte-vue'
   import { mapGetters } from 'vuex'
   import { AdminlteInputTextComponent, AdminlteInputDateMaskComponent, AdminlteInputLocationComponent } from 'acacha-adminlte-vue-forms'
   import Vue from 'vue'
@@ -150,7 +140,7 @@
       AdminlteInputGenderComponent,
       AdminlteInputIdentifiersComponent
     },
-    mixins: [FlashMixin, AlertMixin, ValidationMixin, ClearMixin, ClearErrorsMixin, LoadingMixin],
+    mixins: [FlashMixin, ValidationMixin, ClearMixin, ClearErrorsMixin, LoadingMixin],
     data () {
       return {
         lastStatusCode: null,
